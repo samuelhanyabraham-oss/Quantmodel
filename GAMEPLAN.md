@@ -1,9 +1,17 @@
 # Gameplan
 
 Phased plan for the volatility/drawdown regime project. One phase at a time;
-each phase ends at a hard stop with a deliverable and exit criteria. No phase
-begins without explicit approval of the previous one. No code exists yet — this
-document and `CLAUDE.md` are the only artifacts of Phase 0 so far.
+each phase ends at a hard stop with a deliverable and exit criteria.
+
+**Status (2026-08-13):** Phases 0–5 complete under a blanket "finish the
+project" approval; per-phase artifacts are committed and every run is in
+`experiments.jsonl`. Walk-forward outcome: negative result (see REPORT.md).
+Phase 6's holdout evaluation remains LOCKED — "finish the project" does not
+name the holdout, and the charter demands explicit permission in the
+unlocking message itself. Data-source deviation from this plan: the network
+policy blocked Stooq/FRED/CBOE, so the frozen snapshot uses IBKR MCP daily
+bars (5-year history cap — the binding limitation), with HYG/LQD replacing
+FRED credit spreads; see docs/data_dictionary.md.
 
 The ordering principle: **everything that could flatter a result is built and
 frozen before any model exists.** Harness → data → labels/baselines/validation →

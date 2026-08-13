@@ -104,7 +104,7 @@
     "lead_mean_lead_days": 4.5,
     "auc_minus_persistence": -0.2258,
     "p_raw_vs_persistence": 0.9735,
-    "run_count_M": 5,
+    "run_count_M": 7,
     "p_bonferroni": 1.0
   },
   "_probs": {
@@ -1054,7 +1054,67 @@
     "lead_mean_lead_days": NaN,
     "auc_minus_persistence": -0.091,
     "p_raw_vs_persistence": 0.805,
-    "run_count_M": 5,
+    "run_count_M": 7,
+    "p_bonferroni": 1.0
+  },
+  "logistic_small4": {
+    "name": "logistic_small4",
+    "n_rows": 457,
+    "effective_n": 45.7,
+    "base_rate": 0.1838,
+    "auc": 0.5402,
+    "auc_ci90": [
+      0.3805,
+      0.6902
+    ],
+    "brier": 0.1594,
+    "brier_ci90": [
+      0.0929,
+      0.2302
+    ],
+    "precision": 0.75,
+    "recall": 0.0714,
+    "false_negative_rate": 0.9286,
+    "false_positive_days_frac": 0.0044,
+    "nps_net_ann": -0.00529,
+    "hedge_on_frac": 0.0175,
+    "lead_n_onsets": 15,
+    "lead_n_missed": 14,
+    "lead_median_lead_days": 0.0,
+    "lead_mean_lead_days": 0.0,
+    "auc_minus_persistence": -0.0554,
+    "p_raw_vs_persistence": 0.6775,
+    "run_count_M": 7,
+    "p_bonferroni": 1.0
+  },
+  "gbm_small4": {
+    "name": "gbm_small4",
+    "n_rows": 457,
+    "effective_n": 45.7,
+    "base_rate": 0.1838,
+    "auc": 0.6728,
+    "auc_ci90": [
+      0.5296,
+      0.79
+    ],
+    "brier": 0.1533,
+    "brier_ci90": [
+      0.0892,
+      0.2205
+    ],
+    "precision": 0.0,
+    "recall": 0.0,
+    "false_negative_rate": 1.0,
+    "false_positive_days_frac": 0.0022,
+    "nps_net_ann": -0.00121,
+    "hedge_on_frac": 0.0022,
+    "lead_n_onsets": 15,
+    "lead_n_missed": 15,
+    "lead_median_lead_days": NaN,
+    "lead_mean_lead_days": NaN,
+    "auc_minus_persistence": 0.0771,
+    "p_raw_vs_persistence": 0.204,
+    "run_count_M": 7,
     "p_bonferroni": 1.0
   }
 }
