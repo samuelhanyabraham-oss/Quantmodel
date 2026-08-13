@@ -1,0 +1,23 @@
+{
+  "created_utc": "2026-08-13T10:47:02.476245+00:00",
+  "holdout_boundary_date": "2025-02-12",
+  "holdout_months": 18,
+  "dev_rows": 878,
+  "holdout_rows": 375,
+  "dev_start": "2021-08-16",
+  "dev_end": "2025-02-12",
+  "holdout_start": "2025-02-13",
+  "holdout_end": "2026-08-12",
+  "dev_sha256": "b090d0468bc844191d98429d411d0cac0a2fc81b2defa975fce024a7ac9c9671",
+  "holdout_sha256": "2fb5e6f26bccd7b79efce0c83bde5fcaeaf3a413fff0d2fd4cf2b86867ba1f69",
+  "series": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "HYG",
+    "LQD",
+    "VIX",
+    "VIX3M"
+  ],
+  "source": "IBKR MCP get_price_history, ONE_DAY bars, FIVE_YEARS, RTH only"
+}

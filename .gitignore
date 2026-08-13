@@ -1,9 +1,7 @@
-# Raw data pulls and snapshots live outside version control; the content
-# hashes recorded in experiments.jsonl and data/HOLDOUT_MANIFEST.json are the
-# committed record of what was used.
-data/raw/
-data/snapshots/
-
+# Raw pulls and snapshots ARE committed: the container is ephemeral and the
+# data source (IBKR MCP) is session-bound, so the repo itself must carry the
+# frozen data for any result to be reproducible. Hashes live in
+# data/HOLDOUT_MANIFEST.json.
 __pycache__/
 *.pyc
 .pytest_cache/
