@@ -1,9 +1,10 @@
-# REPORT — Volatility/Drawdown Regime Model (walk-forward; holdout still locked)
+# REPORT — Volatility/Drawdown Regime Model (final: holdout evaluated)
 
-Status: Phases 0–5 complete. The holdout (2025-02-13 → 2026-08-12) has not
-been read; per charter it stays locked until explicitly unlocked. All numbers
-below are purged walk-forward results on the dev sample (2022-09 → 2025-02
-usable rows after warm-up).
+Status: Phases 0–6 complete. The holdout was unlocked by the owner on
+2026-08-13 (data/HOLDOUT_UNLOCK.json) and evaluated exactly once, per the
+pre-registered plan in docs/freeze.md. Sections 1–3 below are the
+walk-forward analysis (written before the holdout was read and left
+unedited); the holdout section follows them.
 
 ## 1. Why this might be wrong
 
@@ -106,11 +107,49 @@ Raw accuracy appears nowhere above, by charter.
   genuinely skillful regime model from luck. The binding constraint is
   data depth, not model capacity.
 
+## Holdout evaluation (run once, 2026-08-13, per docs/freeze.md)
+
+Window: 2025-02-13 → 2026-07-29 (365 rows, **effective n ≈ 37**, base rate
+28.2%). Frozen model, frozen threshold, frozen bands; four experiment
+entries logged; M stood at 16 at adjustment time.
+
+| strategy | AUC [90% CI] | Brier | NPS net (ann.) | hedge-on % |
+|---|---|---|---|---|
+| **gbm_small4 (frozen)** | **0.744 [0.612, 0.853]** | 0.193 | +0.0465 | **100%** |
+| persistence | 0.675 [0.542, 0.789] | 0.255 | +0.0095 | 26% |
+| term structure | 0.613 [0.527, 0.683] | 0.238 | −0.0111 | 11% |
+| trailing pctl | 0.630 [0.493, 0.746] | 0.345 | +0.0063 | 39% |
+
+**Verdict under the pre-registered rule: NO SKILL CLAIMED.**
+AUC advantage over persistence +0.068, p_raw = 0.0845 one-sided; Bonferroni
+over M = 16 logged runs ⇒ p_adj = 1.0, far above the 0.10 rule fixed in
+docs/multiple_testing.md before any model existed.
+
+**The operating point failed outright.** Every holdout probability exceeded
+the frozen 0.20 threshold: the deployed signal degenerates to "always
+hedged" (recall 1.0 because it can't miss; precision = the base rate; bleed
+paid on 72% of days). Its apparently-best NPS (+4.65%/yr) is exactly what a
+constant always-hedge policy would have earned over a window containing the
+spring-2025 drawdown — a constant is not a model, so this number is
+attributed to the period, not to skill. The probability *ranking* (AUC
+0.744) is genuinely encouraging but, at 37 effective observations and after
+the adjustment the charter requires, indistinguishable from luck. The
+calibration shift that broke the threshold (all probabilities elevated
+out-of-sample) is itself evidence the Platt layer fitted on 2022-era dev
+data did not transfer.
+
+**Final project verdict: the success criterion is not met.** The model does
+not demonstrably beat all baselines net of costs with the required
+statistical support. The harness, the leakage discipline, and this negative
+result are the deliverables.
+
 ## Next steps (require human decisions)
 
-1. Unlock the holdout (explicit permission required) and run the one
-   pre-registered evaluation in docs/freeze.md — the project's honest
-   endpoint either way.
-2. Or first secure a data source with 20+ years of daily history and re-run
-   Phases 1–5 unchanged (the harness is source-agnostic); the current
-   5-year cap is the main reason this report can't say anything stronger.
+1. Secure a data source with 20+ years of daily history and re-run Phases
+   1–5 unchanged (the harness is source-agnostic); the 5-year cap is the
+   main reason this report can't say anything stronger. The holdout AUC
+   ranking (0.744) and the vix_slope observation are the two hypotheses
+   worth carrying into that re-run — as hypotheses, pre-registered.
+2. If any deployment is contemplated despite "no skill claimed," the honest
+   comparison is against a static always-hedged overlay, which the frozen
+   operating point replicated at higher complexity.

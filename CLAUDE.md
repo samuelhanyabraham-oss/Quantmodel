@@ -154,6 +154,13 @@ and the two error costs separately. Raw accuracy appears nowhere as a headline.
 
 ## Charter changelog
 
+- 2026-08-13 — Holdout unlocked by owner ("go ahead and run it", in direct
+  reply to the unlock question). Recorded in `data/HOLDOUT_UNLOCK.json`. The
+  holdout-boundary leakage test now additionally accepts experiment entries
+  bearing the holdout snapshot hash **only while that unlock file exists**;
+  dev-hash-only enforcement remains for all other entries. Scope: the single
+  pre-registered evaluation in docs/freeze.md.
+
 - 2026-08-13 — Initial charter committed. Additions over the original draft:
   base-rate note under the target definition; explicit definition of "net" and
   a frozen cost model; holdout manifest + CI boundary check; multiple-testing

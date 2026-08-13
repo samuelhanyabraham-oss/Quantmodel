@@ -131,10 +131,17 @@ def test_no_experiment_crosses_holdout_boundary():
     dev_panel = data.load_dev_panel()  # verifies dev hash internally
     assert str(dev_panel.index.max().date()) <= manifest["holdout_boundary_date"]
 
+    # Holdout-hash entries are legal ONLY while the recorded owner
+    # authorization exists (charter changelog 2026-08-13).
+    unlock_path = ROOT / "data" / "HOLDOUT_UNLOCK.json"
+    allowed = {manifest["dev_sha256"]}
+    if unlock_path.exists() and json.loads(unlock_path.read_text()).get("unlocked"):
+        allowed.add(manifest["holdout_sha256"])
+
     log_path = ROOT / "experiments.jsonl"
     if log_path.exists():
         for line in log_path.read_text().splitlines():
             entry = json.loads(line)
-            assert entry["data_snapshot_hash"] == manifest["dev_sha256"], (
-                f"experiment {entry['config_hash'][:8]} ran on non-dev data"
+            assert entry["data_snapshot_hash"] in allowed, (
+                f"experiment {entry['config_hash'][:8]} ran on unauthorized data"
             )

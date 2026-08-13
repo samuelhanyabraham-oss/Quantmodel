@@ -1,0 +1,7 @@
+{
+  "unlocked": true,
+  "date_utc": "2026-08-13",
+  "authorized_by": "project owner, in-session",
+  "authorization_context": "Assistant stated the holdout evaluation was locked pending explicit permission and that it was 'one command once you give the word'; owner replied 'go ahead and run it' in direct response.",
+  "scope": "One pre-registered evaluation per docs/freeze.md. No re-runs, no threshold changes, no new variants after the first holdout read."
+}

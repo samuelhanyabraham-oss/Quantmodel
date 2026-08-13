@@ -6,9 +6,10 @@ each phase ends at a hard stop with a deliverable and exit criteria.
 **Status (2026-08-13):** Phases 0–5 complete under a blanket "finish the
 project" approval; per-phase artifacts are committed and every run is in
 `experiments.jsonl`. Walk-forward outcome: negative result (see REPORT.md).
-Phase 6's holdout evaluation remains LOCKED — "finish the project" does not
-name the holdout, and the charter demands explicit permission in the
-unlocking message itself. Data-source deviation from this plan: the network
+Phase 6 complete: the owner unlocked the holdout on 2026-08-13
+(data/HOLDOUT_UNLOCK.json) and the single pre-registered evaluation ran —
+final verdict in REPORT.md: no skill claimed; operating point degenerated
+to always-hedged out-of-sample. Data-source deviation from this plan: the network
 policy blocked Stooq/FRED/CBOE, so the frozen snapshot uses IBKR MCP daily
 bars (5-year history cap — the binding limitation), with HYG/LQD replacing
 FRED credit spreads; see docs/data_dictionary.md.

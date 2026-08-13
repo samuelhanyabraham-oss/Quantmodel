@@ -1,0 +1,111 @@
+{
+  "gbm_small4_frozen": {
+    "name": "gbm_small4_frozen",
+    "n_rows": 240,
+    "effective_n": 24.0,
+    "base_rate": 0.325,
+    "auc": 0.4014,
+    "auc_ci90": [
+      0.3104,
+      0.514
+    ],
+    "brier": 0.3111,
+    "brier_ci90": [
+      0.1874,
+      0.4345
+    ],
+    "precision": 0.0,
+    "recall": 0.0,
+    "false_negative_rate": 1.0,
+    "false_positive_days_frac": 0.0,
+    "nps_net_ann": 0.0,
+    "hedge_on_frac": 0.0,
+    "lead_n_onsets": 12,
+    "lead_n_missed": 12,
+    "lead_median_lead_days": NaN,
+    "lead_mean_lead_days": NaN,
+    "auc_minus_persistence": -0.1206,
+    "p_raw_vs_persistence": 0.8765,
+    "run_count_M": 12,
+    "p_bonferroni": 1.0,
+    "skill_claimed": false
+  },
+  "persistence": {
+    "name": "persistence",
+    "n_rows": 240,
+    "effective_n": 24.0,
+    "base_rate": 0.325,
+    "auc": 0.5221,
+    "auc_ci90": [
+      0.424,
+      0.61
+    ],
+    "brier": 0.4208,
+    "brier_ci90": [
+      0.3042,
+      0.5375
+    ],
+    "precision": 0.3544,
+    "recall": 0.359,
+    "false_negative_rate": 0.641,
+    "false_positive_days_frac": 0.2125,
+    "nps_net_ann": -0.02024,
+    "hedge_on_frac": 0.3292,
+    "lead_n_onsets": 12,
+    "lead_n_missed": 7,
+    "lead_median_lead_days": 2.0,
+    "lead_mean_lead_days": 4.4
+  },
+  "term_structure": {
+    "name": "term_structure",
+    "n_rows": 240,
+    "effective_n": 24.0,
+    "base_rate": 0.325,
+    "auc": 0.5292,
+    "auc_ci90": [
+      0.4937,
+      0.5714
+    ],
+    "brier": 0.3125,
+    "brier_ci90": [
+      0.1875,
+      0.4417
+    ],
+    "precision": 0.6667,
+    "recall": 0.0769,
+    "false_negative_rate": 0.9231,
+    "false_positive_days_frac": 0.0125,
+    "nps_net_ann": -0.01239,
+    "hedge_on_frac": 0.0375,
+    "lead_n_onsets": 12,
+    "lead_n_missed": 12,
+    "lead_median_lead_days": NaN,
+    "lead_mean_lead_days": NaN
+  },
+  "trailing_pctl": {
+    "name": "trailing_pctl",
+    "n_rows": 240,
+    "effective_n": 24.0,
+    "base_rate": 0.325,
+    "auc": 0.5494,
+    "auc_ci90": [
+      0.4418,
+      0.65
+    ],
+    "brier": 0.4333,
+    "brier_ci90": [
+      0.3208,
+      0.5417
+    ],
+    "precision": 0.375,
+    "recall": 0.5,
+    "false_negative_rate": 0.5,
+    "false_positive_days_frac": 0.2708,
+    "nps_net_ann": -0.01492,
+    "hedge_on_frac": 0.4333,
+    "lead_n_onsets": 12,
+    "lead_n_missed": 5,
+    "lead_median_lead_days": 7.0,
+    "lead_mean_lead_days": 6.142857142857143
+  }
+}
