@@ -1,0 +1,8 @@
+# Pinned environment — Phase 0. Python 3.11.
+# Changing a pin is an experiment-affecting change: bump deliberately, in its
+# own commit, never as a side effect.
+numpy==2.4.6
+pandas==3.0.5
+scipy==1.17.1
+scikit-learn==1.9.0
+pytest==9.1.1

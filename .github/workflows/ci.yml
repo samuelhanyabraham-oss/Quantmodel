@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned environment
+        run: pip install -r requirements.txt
+      - name: Run test suite (includes leakage suite)
+        # -rs so skipped leakage stubs are listed individually in the log,
+        # alongside the conftest's unimplemented-count banner.
+        run: pytest -rs

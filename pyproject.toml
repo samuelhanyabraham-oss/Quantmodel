@@ -1,0 +1,11 @@
+[project]
+name = "regime"
+version = "0.0.1"
+description = "Volatility/drawdown regime research harness (see CLAUDE.md)"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "leakage_stub: charter-mandated leakage test not yet implemented (Phase 3)",
+]

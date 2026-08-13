@@ -1,0 +1,11 @@
+# Raw data pulls and snapshots live outside version control; the content
+# hashes recorded in experiments.jsonl and data/HOLDOUT_MANIFEST.json are the
+# committed record of what was used.
+data/raw/
+data/snapshots/
+
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/
