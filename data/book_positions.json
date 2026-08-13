@@ -1,0 +1,23 @@
+{
+  "asof": "2026-08-13",
+  "note": "Combined Robinhood holdings (individual margin + Roth IRA), shares per symbol. GPUSB (6.91 sh, private program stock, no market data) and the BMNR Jan-2027 option are excluded from the book index and documented as such. Weights are CURRENT market-value weights projected back through history (documented assumption in src/regime/book.py).",
+  "shares": {
+    "IREN": 590.0,
+    "CLSK": 680.0,
+    "NBIS": 211.3,
+    "APLD": 400.0,
+    "CRWV": 200.0,
+    "BTDR": 580.0,
+    "DRAM": 370.0,
+    "SNDK": 15.0,
+    "SHAZ": 606.613217,
+    "TE": 1067.587560,
+    "CORZ": 20.0,
+    "KEEL": 205.0
+  },
+  "last_close_2026_08_12": {
+    "IREN": 43.67, "CLSK": 12.18, "NBIS": 259.20, "APLD": 31.15,
+    "CRWV": 107.73, "BTDR": 9.02, "DRAM": 54.80, "SNDK": 1344.29,
+    "SHAZ": 68.46, "TE": 4.90, "CORZ": 20.87, "KEEL": 3.54
+  }
+}

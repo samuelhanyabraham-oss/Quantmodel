@@ -140,6 +140,9 @@ def test_no_experiment_crosses_holdout_boundary():
         allowed.add(manifest["holdout_sha256"])
     if manifest.get("dissolved"):
         allowed.add(manifest["full_sha256"])
+    book_manifest = ROOT / "data" / "BOOK_MANIFEST.json"
+    if book_manifest.exists():
+        allowed.add(json.loads(book_manifest.read_text())["book_sha256"])
 
     log_path = ROOT / "experiments.jsonl"
     if log_path.exists():

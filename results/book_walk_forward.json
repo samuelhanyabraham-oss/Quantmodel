@@ -1,0 +1,58 @@
+{
+  "book_persistence": {
+    "name": "book_persistence",
+    "n_rows": 831,
+    "effective_n": 83.1,
+    "base_rate": 0.361,
+    "auc": 0.6388,
+    "auc_ci90": [
+      0.5619,
+      0.7082
+    ],
+    "brier": 0.3189,
+    "brier_ci90": [
+      0.2491,
+      0.3924
+    ],
+    "precision": 0.5681,
+    "recall": 0.4867,
+    "false_negative_rate": 0.5133,
+    "false_positive_days_frac": 0.1336,
+    "nps_net_ann": 0.18223,
+    "hedge_on_frac": 0.3093,
+    "lead_n_onsets": 29,
+    "lead_n_missed": 19,
+    "lead_median_lead_days": 7.5,
+    "lead_mean_lead_days": 6.0
+  },
+  "book_logistic_adaptive": {
+    "name": "book_logistic_adaptive",
+    "n_rows": 831,
+    "effective_n": 83.1,
+    "base_rate": 0.361,
+    "auc": 0.3768,
+    "auc_ci90": [
+      0.2824,
+      0.468
+    ],
+    "brier": 0.3048,
+    "brier_ci90": [
+      0.268,
+      0.3411
+    ],
+    "precision": 0.3782,
+    "recall": 0.3467,
+    "false_negative_rate": 0.6533,
+    "false_positive_days_frac": 0.2058,
+    "nps_net_ann": 0.10259,
+    "hedge_on_frac": 0.3309,
+    "lead_n_onsets": 29,
+    "lead_n_missed": 23,
+    "lead_median_lead_days": 7.0,
+    "lead_mean_lead_days": 6.666666666666667,
+    "auc_minus_persistence": -0.262,
+    "p_raw_vs_persistence": 1.0,
+    "run_count_M": 27,
+    "p_bonferroni": 1.0
+  }
+}

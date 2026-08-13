@@ -1,0 +1,27 @@
+{
+  "created_utc": "2026-08-13T12:31:10.788090+00:00",
+  "book_sha256": "2242f2fe8368c1593964f2fd27d9cbff8f6c3a5508eaeefc4269844ec3e89425",
+  "rows": 1252,
+  "start": "2021-08-17",
+  "end": "2026-08-12",
+  "weights_asof": "2026-08-13",
+  "target_weights": {
+    "NBIS": 0.2531,
+    "SHAZ": 0.1919,
+    "IREN": 0.1191,
+    "CRWV": 0.0996,
+    "DRAM": 0.0937,
+    "SNDK": 0.0932,
+    "APLD": 0.0576,
+    "CLSK": 0.0383,
+    "BTDR": 0.0242,
+    "TE": 0.0242,
+    "KEEL": 0.0034,
+    "CORZ": 0.0019
+  },
+  "source": "Robinhood MCP get_equity_historicals, day bars, split-adjusted, RTH",
+  "excluded": [
+    "GPUSB (no market data)",
+    "BMNR Jan-2027 option"
+  ]
+}

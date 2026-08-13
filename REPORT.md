@@ -170,6 +170,36 @@ the holdout then i want this to work"). Consequences, recorded plainly:
   disciplined hedging heuristic roughly on par with a one-line volatility
   rule — not a validated model.
 
+## Book extension (2026-08-13): the owner's actual portfolio
+
+The machinery was pointed at the owner's real holdings (12 names, Robinhood
+margin + IRA, current-weight backcast; NBIS 25% / SHAZ 19% / IREN 12% top
+weights — an AI-infrastructure/bitcoin-miner cluster). Data notes: two
+symbols carried predecessor-listing garbage (SHAZ: 292 fake ±160% days),
+removed by a longest-clean-suffix guard; book snapshot hash-locked in
+`data/BOOK_MANIFEST.json`.
+
+The book is NOT the SPY tape:
+- annualized vol ≈ 65% (vs SPY ~13%); worst single day −35%; max drawdown
+  in sample −85%; **currently ~24% below its sample peak**
+- 63-day beta to SPY ≈ 4.4 — an SPY-based hedge must be sized on beta-
+  equivalent notional, not book value
+
+Book walk-forward (M=27 after these runs): the fitted model is anti-skill
+(AUC 0.377 [0.28, 0.47]); **book-persistence** (trailing 10d RV above its
+own 1y 75th pct) scores AUC 0.639 [0.56, 0.71] and — unlike every SPY
+strategy — is decisively net-positive: **NPS +18.2%/yr**, because this
+book's 10-day drawdowns dwarf hedge bleed. The operational signal in
+`scripts/book_pipeline.py predict` is therefore the persistence rule; the
+model is logged as a diagnostic only.
+
+Current reading (2026-08-12): book trailing RV 135% > threshold 87% —
+**the book is in an elevated-vol regime now** even though SPY is calm;
+suggested hedge band 25–50% of book value, ≈ $167k SPY-equivalent short
+notional per $100k of book at the band midpoint (beta 4.4). Same honesty
+clause as everywhere: the persistence rule is in-sample-validated only;
+its forward record accumulates in forward_test.jsonl.
+
 ## Next steps (require human decisions)
 
 1. Secure a data source with 20+ years of daily history and re-run Phases
