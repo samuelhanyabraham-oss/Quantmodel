@@ -123,13 +123,14 @@ def test_revised_series_used_at_first_print():
 
 
 def test_no_experiment_crosses_holdout_boundary():
-    """Every logged experiment must have run on the dev snapshot (hash match),
-    and the dev snapshot must end at or before the holdout boundary."""
+    """Every logged experiment must carry a frozen snapshot hash. Before the
+    owner-ordered dissolution that means the dev hash (plus the holdout hash
+    for the one authorized evaluation); after it, the frozen full-snapshot
+    hash. Unfrozen or unknown data hashes are never legal."""
     manifest = data.load_manifest()
     assert manifest["dev_end"] <= manifest["holdout_boundary_date"]
 
-    dev_panel = data.load_dev_panel()  # verifies dev hash internally
-    assert str(dev_panel.index.max().date()) <= manifest["holdout_boundary_date"]
+    data.load_dev_panel()  # verifies the active snapshot hash internally
 
     # Holdout-hash entries are legal ONLY while the recorded owner
     # authorization exists (charter changelog 2026-08-13).
@@ -137,6 +138,8 @@ def test_no_experiment_crosses_holdout_boundary():
     allowed = {manifest["dev_sha256"]}
     if unlock_path.exists() and json.loads(unlock_path.read_text()).get("unlocked"):
         allowed.add(manifest["holdout_sha256"])
+    if manifest.get("dissolved"):
+        allowed.add(manifest["full_sha256"])
 
     log_path = ROOT / "experiments.jsonl"
     if log_path.exists():

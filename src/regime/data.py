@@ -99,39 +99,82 @@ def build_snapshot() -> dict:
     return manifest
 
 
+def dissolve_holdout() -> dict:
+    """Owner-ordered dissolution (charter changelog 2026-08-13): merge dev +
+    holdout into a frozen full snapshot (v2). One-way; requires the recorded
+    unlock. After this, load_dev_panel() serves the full panel and the
+    holdout loader refuses (nothing is 'held out' anymore)."""
+    unlock = ROOT / "data" / "HOLDOUT_UNLOCK.json"
+    if not (unlock.exists() and json.loads(unlock.read_text()).get("unlocked")):
+        raise PermissionError("dissolution requires the recorded owner unlock")
+    m = load_manifest()
+    if m.get("dissolved"):
+        raise RuntimeError("holdout already dissolved")
+    dev = pd.read_csv(SNAP_DIR / "panel_dev.csv", index_col="date", parse_dates=["date"])
+    holdout = pd.read_csv(
+        SNAP_DIR / "panel_holdout.csv", index_col="date", parse_dates=["date"]
+    )
+    full = pd.concat([dev, holdout])
+    full_path = SNAP_DIR / "panel_full.csv"
+    full.to_csv(full_path, float_format="%.6f")
+    m.update(
+        {
+            "dissolved": True,
+            "dissolved_utc": pd.Timestamp.utcnow().isoformat(),
+            "full_rows": len(full),
+            "full_sha256": sha256_file(full_path),
+        }
+    )
+    MANIFEST_PATH.write_text(json.dumps(m, indent=2) + "\n")
+    return m
+
+
 def load_manifest() -> dict:
     return json.loads(MANIFEST_PATH.read_text())
 
 
 def snapshot_hash() -> str:
-    """The data hash experiments must log (dev snapshot only)."""
-    return load_manifest()["dev_sha256"]
+    """The data hash experiments must log (full snapshot after dissolution,
+    dev snapshot before)."""
+    m = load_manifest()
+    return m["full_sha256"] if m.get("dissolved") else m["dev_sha256"]
 
 
 def load_dev_panel(verify: bool = True) -> pd.DataFrame:
-    """Load the development panel. This is the ONLY loader experiment code
-    may use before holdout is unlocked."""
+    """Load the development panel: the dev snapshot, or the full snapshot
+    after the owner-ordered dissolution (charter changelog 2026-08-13)."""
     m = load_manifest()
-    path = SNAP_DIR / "panel_dev.csv"
-    if verify and sha256_file(path) != m["dev_sha256"]:
-        raise RuntimeError("dev snapshot hash mismatch — snapshot was modified")
+    if m.get("dissolved"):
+        path = SNAP_DIR / "panel_full.csv"
+        want = m["full_sha256"]
+    else:
+        path = SNAP_DIR / "panel_dev.csv"
+        want = m["dev_sha256"]
+    if verify and sha256_file(path) != want:
+        raise RuntimeError("snapshot hash mismatch — snapshot was modified")
     df = pd.read_csv(path, index_col="date", parse_dates=["date"])
-    assert str(df.index.max().date()) <= m["holdout_boundary_date"], (
-        "dev panel crosses the holdout boundary"
-    )
+    if not m.get("dissolved"):
+        assert str(df.index.max().date()) <= m["holdout_boundary_date"], (
+            "dev panel crosses the holdout boundary"
+        )
     return df
 
 
 def load_holdout_panel(*, i_have_explicit_permission: bool = False) -> pd.DataFrame:
     """Holdout loader. The flag is a tripwire, not security: it must appear
-    (grep-ably) at any call site, and no committed experiment code may set it
-    until the holdout is unlocked in writing."""
+    (grep-ably) at any call site. After dissolution there is no holdout to
+    load — refuse loudly rather than pretend."""
+    m = load_manifest()
+    if m.get("dissolved"):
+        raise RuntimeError(
+            "holdout was dissolved into the full snapshot (charter changelog "
+            "2026-08-13); nothing is held out — use load_dev_panel()"
+        )
     if not i_have_explicit_permission:
         raise PermissionError(
             "Holdout is locked (CLAUDE.md). Requires explicit permission in the "
             "unlocking message."
         )
-    m = load_manifest()
     path = SNAP_DIR / "panel_holdout.csv"
     if sha256_file(path) != m["holdout_sha256"]:
         raise RuntimeError("holdout snapshot hash mismatch — snapshot was modified")

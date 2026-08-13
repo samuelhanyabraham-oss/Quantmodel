@@ -1,4 +1,28 @@
-# Pre-holdout freeze — 2026-08-13
+# Freeze v2 — 2026-08-13, post-dissolution (operational configuration)
+
+The holdout was dissolved by the owner after its one evaluation (charter
+changelog). Nothing below claims out-of-sample skill; freeze v2 exists so
+the forward test is well-defined and un-tunable.
+
+- **Model:** logistic on [rv10, vix, vix_slope, rv_ratio_10_63], C=0.1,
+  balanced class weights, Platt calibration on the chronological tail 25%,
+  seed 20260813. Chosen on full-sample walk-forward where it was the only
+  net-positive model variant (NPS +0.64%/yr, AUC 0.638) — statistically
+  indistinguishable from the baselines (p_raw vs persistence: 0.52).
+- **Operating point:** signal on when the probability exceeds the 70th
+  percentile of its own trailing 126 values (min 60). Rank-based, replacing
+  the absolute 0.20 threshold that degenerated to always-on when
+  calibration shifted on the holdout.
+- **Bands (rank-based, monotone):** rank < 0.70 → 0–10%; 0.70–0.85 →
+  25–50%; ≥ 0.85 → 50–75% (`regime.bands.hedge_band_from_rank`).
+- **Forward test:** `scripts/predict_today.py` appends each day's
+  prediction to `forward_test.jsonl` before its label resolves. A skill
+  claim requires the accumulated forward record to beat persistence under
+  the same block-bootstrap + Bonferroni machinery — no other path exists.
+
+---
+
+# Freeze v1 (historical) — pre-holdout, 2026-08-13
 
 Everything below is fixed BEFORE any holdout row is read. The holdout remains
 locked until explicitly unlocked in writing (CLAUDE.md). Nothing in this file

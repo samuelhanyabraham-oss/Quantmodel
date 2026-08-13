@@ -1,7 +1,25 @@
 import numpy as np
 import pytest
 
-from regime.bands import BANDS, hedge_band
+from regime.bands import BANDS, RANK_BANDS, hedge_band, hedge_band_from_rank
+
+
+def test_rank_bands_are_monotone():
+    grid = np.linspace(0, 1, 201)
+    prev = (-1.0, -1.0)
+    for r in grid:
+        b = hedge_band_from_rank(float(r))
+        assert b[0] >= prev[0] and b[1] >= prev[1]
+        prev = b
+
+
+def test_rank_band_edges_match_freeze_v2():
+    assert RANK_BANDS == [(0.00, 0.00, 0.10), (0.70, 0.25, 0.50), (0.85, 0.50, 0.75)]
+    assert hedge_band_from_rank(0.69) == (0.0, 0.10)
+    assert hedge_band_from_rank(0.70) == (0.25, 0.50)
+    assert hedge_band_from_rank(0.90) == (0.50, 0.75)
+    with pytest.raises(ValueError):
+        hedge_band_from_rank(-0.1)
 
 
 def test_bands_are_monotone():

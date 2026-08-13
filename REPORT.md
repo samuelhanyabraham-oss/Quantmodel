@@ -143,13 +143,42 @@ not demonstrably beat all baselines net of costs with the required
 statistical support. The harness, the leakage discipline, and this negative
 result are the deliverables.
 
+## Post-dissolution addendum (2026-08-13)
+
+The owner dissolved the holdout after its single evaluation ("get rid of
+the holdout then i want this to work"). Consequences, recorded plainly:
+
+- The holdout verdict above remains the last clean out-of-sample result.
+  Nothing after the dissolution can claim out-of-sample validity; the full
+  five years are now development data (snapshot v2, hash-locked).
+- **Re-running the walk-forward on the full sample — with the 2025–26
+  stress episodes now inside the test folds — did not change the answer.**
+  Best model variant (logistic, 4 features, adaptive rank threshold): AUC
+  0.638 [0.518, 0.750], NPS +0.64%/yr, vs persistence 0.642 and trailing
+  percentile 0.650. p_raw vs persistence 0.52; M = 23. The holdout's
+  encouraging AUC (0.744) did not replicate as a general property — it was
+  one period, not skill.
+- The genuine defect the holdout exposed is fixed: the operating point is
+  now the probability's trailing-quantile RANK (70th pct, 126-day window),
+  immune to level shifts in calibration; bands are rank-based
+  (freeze v2, `docs/freeze.md`).
+- **"Working" now means:** `scripts/predict_today.py` emits a daily
+  probability, rank, and hedge band from the frozen config, and appends
+  every prediction to `forward_test.jsonl` before its label resolves. That
+  accumulating record is the only remaining path to an honest skill claim.
+  Until it delivers one, the correct reading of this system is: a
+  disciplined hedging heuristic roughly on par with a one-line volatility
+  rule — not a validated model.
+
 ## Next steps (require human decisions)
 
 1. Secure a data source with 20+ years of daily history and re-run Phases
    1–5 unchanged (the harness is source-agnostic); the 5-year cap is the
-   main reason this report can't say anything stronger. The holdout AUC
-   ranking (0.744) and the vix_slope observation are the two hypotheses
-   worth carrying into that re-run — as hypotheses, pre-registered.
-2. If any deployment is contemplated despite "no skill claimed," the honest
-   comparison is against a static always-hedged overlay, which the frozen
-   operating point replicated at higher complexity.
+   main reason this report can't say anything stronger.
+2. Let the forward test run: refresh the snapshot periodically (new frozen
+   version each time), run `predict_today.py` daily, and evaluate the
+   forward record against persistence once it holds a few hundred rows
+   (~2 years). No skill claim before then.
+3. If any deployment is contemplated meanwhile, the honest comparison is
+   against a static always-hedged overlay and the one-line trailing
+   percentile rule, both of which matched or beat every model in-sample.

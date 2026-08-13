@@ -19,5 +19,9 @@
     "VIX",
     "VIX3M"
   ],
-  "source": "IBKR MCP get_price_history, ONE_DAY bars, FIVE_YEARS, RTH only"
+  "source": "IBKR MCP get_price_history, ONE_DAY bars, FIVE_YEARS, RTH only",
+  "dissolved": true,
+  "dissolved_utc": "2026-08-13T12:12:57.685387+00:00",
+  "full_rows": 1253,
+  "full_sha256": "73c2fe402e966a0384e9f73d4cfd5aaabda0436e608c0d4c318291f9836fa2e8"
 }

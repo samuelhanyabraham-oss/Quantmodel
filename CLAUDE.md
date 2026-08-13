@@ -72,10 +72,17 @@ baselines gross but loses net has failed.
   observations by roughly an order of magnitude. Confidence intervals must use
   the effective count (block bootstrap or Newey–West-style adjustment; method
   documented once and reused everywhere).
-- Holdout: the most recent 18 months, untouched until I say otherwise. The
-  holdout boundary date and a hash of the holdout rows are written to
-  `data/HOLDOUT_MANIFEST.json` at carve-out time; CI fails if any experiment's
-  data range crosses the boundary.
+- Holdout: DISSOLVED by owner on 2026-08-13 (see changelog), after being
+  evaluated exactly once under the pre-registered plan. All five years are
+  now development data (snapshot v2, hash-locked). Consequence, stated
+  bluntly: **no result produced after the dissolution can claim
+  out-of-sample validity.** The only remaining honest validation is data
+  that does not exist yet; a forward-test protocol (below) replaces the
+  holdout. CI still fails if any experiment's data hash is not a frozen
+  snapshot hash.
+- Forward test: the frozen configuration emits one prediction per day from
+  freeze date onward; predictions are logged before their labels resolve.
+  Skill claims, if ever, come from that accumulating record — nothing else.
 - Fit all scalers, imputers, and percentile thresholds on the training fold only.
 - Metrics: AUC, Brier score, precision and recall at the chosen operating
   threshold, calibration curve, and **lead time** (how many days before a
@@ -154,6 +161,14 @@ and the two error costs separately. Raw accuracy appears nowhere as a headline.
 
 ## Charter changelog
 
+- 2026-08-13 — Holdout DISSOLVED by owner ("get rid of the holdout then i
+  want this to work"). It had already been read once under the frozen plan,
+  so its clean-validation value was spent; its 18 months (which contain the
+  richest stress episodes in the sample) join the development set as
+  snapshot v2. The final clean result remains the holdout verdict recorded
+  in REPORT.md ("no skill claimed") — dissolution does not overturn it.
+  Everything after this entry is in-sample development; the forward-test
+  protocol added to Validation is the only path to a future skill claim.
 - 2026-08-13 — Holdout unlocked by owner ("go ahead and run it", in direct
   reply to the unlock question). Recorded in `data/HOLDOUT_UNLOCK.json`. The
   holdout-boundary leakage test now additionally accepts experiment entries
