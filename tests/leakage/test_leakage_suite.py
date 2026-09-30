@@ -135,14 +135,12 @@ def test_no_experiment_crosses_holdout_boundary():
     # Holdout-hash entries are legal ONLY while the recorded owner
     # authorization exists (charter changelog 2026-08-13).
     unlock_path = ROOT / "data" / "HOLDOUT_UNLOCK.json"
-    allowed = {manifest["dev_sha256"]}
+    allowed = data.frozen_hashes()
     if unlock_path.exists() and json.loads(unlock_path.read_text()).get("unlocked"):
         allowed.add(manifest["holdout_sha256"])
-    if manifest.get("dissolved"):
-        allowed.add(manifest["full_sha256"])
-    book_manifest = ROOT / "data" / "BOOK_MANIFEST.json"
-    if book_manifest.exists():
-        allowed.add(json.loads(book_manifest.read_text())["book_sha256"])
+    if (ROOT / "data" / "BOOK_MANIFEST.json").exists():
+        from regime import book
+        allowed |= book.frozen_book_hashes()
 
     log_path = ROOT / "experiments.jsonl"
     if log_path.exists():

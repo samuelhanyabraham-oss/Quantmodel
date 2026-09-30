@@ -14,6 +14,13 @@ policy blocked Stooq/FRED/CBOE, so the frozen snapshot uses IBKR MCP daily
 bars (5-year history cap — the binding limitation), with HYG/LQD replacing
 FRED credit spreads; see docs/data_dictionary.md.
 
+**Status (2026-09-30):** forward-test operations only — no new modeling
+phase. First data refresh frozen (panel v3, book v2, through 2026-09-29,
+Robinhood-sourced, overlap-verified). Forward record scored: 3 resolved
+predictions, nothing claimable. SPY forward test paused on a missing
+VIX3M feed; book signal continues (currently out of regime). See REPORT.md
+"Forward test — first refresh".
+
 The ordering principle: **everything that could flatter a result is built and
 frozen before any model exists.** Harness → data → labels/baselines/validation →
 features → models → report. The holdout is last and gated separately.

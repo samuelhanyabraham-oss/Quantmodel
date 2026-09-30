@@ -1,0 +1,105 @@
+{
+  "scored_utc": "2026-09-30T13:15:32.256734+00:00",
+  "panel_hash": "03e4e049ed307ffd2f29deee58d192ead672fe155b31ad2ec5a9db99c1289b95",
+  "book_hash": "116e0eeb2fc83224359b5e30910b202044180f88eafa4a8195dec39e08ce8668",
+  "latest_bar": {
+    "SPY": "2026-09-29",
+    "book": "2026-09-29"
+  },
+  "duplicate_entries_ignored": 2,
+  "aggregate": {
+    "SPY": {
+      "n_logged": 1,
+      "n_resolved": 1,
+      "n_pending": 0,
+      "confusion": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 0,
+        "TN": 1
+      },
+      "false_negatives_unhedged_into_regime": 0,
+      "false_positives_bleed_in_calm": 0,
+      "persistence_agreement": 1.0,
+      "nps_net_ann_signal": 0.0,
+      "nps_net_ann_persistence": 0.0,
+      "effective_n_approx": 0.1,
+      "skill_test": "not attempted: n_resolved < MIN_ROWS_FOR_TEST"
+    },
+    "book": {
+      "n_logged": 2,
+      "n_resolved": 2,
+      "n_pending": 0,
+      "confusion": {
+        "TP": 0,
+        "FP": 1,
+        "FN": 0,
+        "TN": 1
+      },
+      "false_negatives_unhedged_into_regime": 0,
+      "false_positives_bleed_in_calm": 1,
+      "persistence_agreement": 0.5,
+      "nps_net_ann_signal": 0.45486,
+      "nps_net_ann_persistence": 1.16172,
+      "effective_n_approx": 0.2,
+      "skill_test": "not attempted: n_resolved < MIN_ROWS_FOR_TEST"
+    }
+  },
+  "rows": [
+    {
+      "asof": "2026-08-12",
+      "universe": "SPY",
+      "config": "freeze-v2 logistic_small4 adaptive q70 w126",
+      "signal": 0,
+      "band": [
+        0.0,
+        0.1
+      ],
+      "resolved": true,
+      "label": 0,
+      "rv_fwd_ann": 0.0753,
+      "rv_thresh_ann": 0.144,
+      "mdd_fwd": -0.0196,
+      "fwd_ret_10": -0.0083,
+      "persistence_signal": 0,
+      "outcome": "TN"
+    },
+    {
+      "asof": "2026-08-12",
+      "universe": "book",
+      "config": "book-v1 logistic adaptive q70 w126",
+      "signal": 0,
+      "band": [
+        0.0,
+        0.1
+      ],
+      "resolved": true,
+      "label": 0,
+      "rv_fwd_ann": 0.6131,
+      "rv_thresh_ann": 0.8732,
+      "mdd_fwd": -0.1697,
+      "fwd_ret_10": -0.0962,
+      "persistence_signal": 1,
+      "outcome": "TN"
+    },
+    {
+      "asof": "2026-08-12",
+      "universe": "book",
+      "config": "book-v1 persistence-operational, logistic diagnostic",
+      "signal": 1,
+      "band": [
+        0.25,
+        0.5
+      ],
+      "resolved": true,
+      "label": 0,
+      "rv_fwd_ann": 0.6131,
+      "rv_thresh_ann": 0.8732,
+      "mdd_fwd": -0.1697,
+      "fwd_ret_10": -0.0962,
+      "persistence_signal": 1,
+      "outcome": "FP"
+    }
+  ],
+  "claim": "none \u2014 forward record too short for any test (see aggregate.skill_test)"
+}

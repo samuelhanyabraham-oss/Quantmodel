@@ -35,6 +35,22 @@ RANK_WINDOW = 126
 FORWARD_LOG = ROOT / "forward_test.jsonl"
 
 
+def already_logged(asof: str, config: str, universe: str | None = None) -> bool:
+    """Idempotency: one forward-test entry per (asof, config, universe).
+    The 2026-08-12 entries were written twice by two runs of the same
+    script; the record is append-only, so they stay, and the scorer
+    de-duplicates. From here on the append itself refuses a repeat."""
+    if not FORWARD_LOG.exists():
+        return False
+    for line in FORWARD_LOG.read_text().splitlines():
+        if not line.strip():
+            continue
+        e = json.loads(line)
+        if e.get("asof") == asof and e.get("config") == config and e.get("universe") == universe:
+            return True
+    return False
+
+
 def main() -> None:
     panel = data.load_dev_panel()
     lab = labels.build_labels(panel["SPY_close"])
@@ -52,7 +68,19 @@ def main() -> None:
     )
 
     # Score the trailing window + the latest bar (features need no labels).
-    scorable = feats.dropna()
+    scorable = feats[SMALL].dropna()
+    # Staleness guard: the prediction must be for the panel's latest bar.
+    # If a frozen feature can't be computed there (a series the refresh
+    # could not deliver — VIX3M since 2026-08-13), refuse rather than
+    # silently re-emit the last computable bar as if it were today's.
+    latest = panel.index.max()
+    if scorable.index[-1] != latest:
+        missing = [c for c in SMALL if pd.isna(feats.loc[latest, c])]
+        raise SystemExit(
+            f"REFUSED: frozen features {missing} are not computable on the latest bar "
+            f"{latest.date()} (last computable: {scorable.index[-1].date()}). No "
+            "prediction logged. The frozen config needs those series refreshed."
+        )
     recent = scorable.iloc[-(RANK_WINDOW + 1) :]
     probs = calibrate(model.predict_proba(scaler.transform(recent[SMALL].to_numpy(dtype=float)))[:, 1])
     p_today = float(probs[-1])
@@ -72,6 +100,9 @@ def main() -> None:
             (recent.index[-1] + pd.tseries.offsets.BDay(labels.HORIZON)).date()
         ),
     }
+    if already_logged(asof, entry["config"]):
+        print(json.dumps(entry, indent=2))
+        raise SystemExit(f"already logged for {asof} — not appended twice")
     with open(FORWARD_LOG, "a", encoding="utf-8") as fh:
         fh.write(json.dumps(entry, sort_keys=True) + "\n")
     experiment_log.log_run(

@@ -200,15 +200,75 @@ notional per $100k of book at the band midpoint (beta 4.4). Same honesty
 clause as everywhere: the persistence rule is in-sample-validated only;
 its forward record accumulates in forward_test.jsonl.
 
+## Forward test — first refresh (2026-09-30)
+
+Operational continuation only; no modeling change, no new variant, no
+threshold touched. Data refreshed through 2026-09-29 (33 trading days) as
+new frozen versions (panel v3, book v2), Robinhood-sourced because IBKR was
+unauthorized in this session; closes matched the frozen IBKR values to the
+cent on the overlap. Two runs logged (scoring, book prediction): M = 31.
+
+**Resolved predictions (the whole forward record so far):**
+
+| asof | universe | signal / band | realized label | fwd RV vs thr | fwd 10d max DD | persistence said |
+|---|---|---|---|---|---|---|
+| 2026-08-12 | SPY (freeze v2 model) | 0 / 0–10% | 0 | 8% vs 14% | −2.0% | 0 |
+| 2026-08-12 | book (persistence rule, operational) | 1 / 25–50% | 0 | 61% vs 87% | **−17.0%** | 1 |
+| 2026-08-12 | book (logistic, diagnostic only) | 0 / 0–10% | 0 | 61% vs 87% | −17.0% | 1 |
+
+Three rows ≈ 0.3 effective observations. No test attempted (the scorer
+refuses below 60 resolved rows per universe); no claim of any kind.
+
+**What the one book row exposes, honestly.** By the charter label the
+operational hedge signal was a *false positive*: the book's forward 10-day
+RV (61%) stayed under its 1-year 75th-percentile threshold (87%). Over the
+same 10 days the book fell **17%** from the 08-12 close, and under the
+frozen cost model being hedged was net-positive (NPS +0.45 ann. vs +1.16
+for the always-on persistence rule). On a 65%-vol book the vol-percentile
+label sets so high a bar that a −17% fortnight counts as "calm". That is a
+property of the target definition applied to this universe, not a finding
+about the signal — and the target definition is not changeable without the
+owner's say-so. It is flagged here as an open question (below), not acted on.
+
+**Current reading (2026-09-29):** book trailing 10-day RV 48% vs threshold
+88% — **out of regime**; suggested band 0–10%; 63-day beta to SPY 4.65 (≈
+$23k SPY-equivalent short notional per $100k of book at the band midpoint).
+The book index is −7% since 2026-08-12. Model diagnostic unavailable
+(needs VIX3M). The 2026-09-29 prediction is logged; its label resolves after
+2026-10-13.
+
+**SPY forward test: paused, not failed.** The frozen model's `vix_slope`
+feature needs VIX3M, which no reachable source delivered after 2026-08-12
+(Robinhood does not carry it; CBOE is blocked by the network policy; IBKR
+needs authorization). The prediction script now refuses loudly on a bar
+where a frozen feature is missing, rather than re-emitting the last
+computable bar. The record of the two duplicate 2026-08-12 entries stays
+(append-only); the scorer de-duplicates and the append is now idempotent.
+
+**Weights are unchanged** from the 2026-08-13 positions snapshot. If the
+holdings have changed, the book index is a backcast of a stale composition;
+re-weighting is a logged decision, not something a refresh does silently.
+
 ## Next steps (require human decisions)
 
-1. Secure a data source with 20+ years of daily history and re-run Phases
+1. **VIX3M feed** (blocks the SPY forward test): authorize IBKR in a
+   session, or allow-list `cdn.cboe.com`, or decide on a proxy — the last
+   one changes the frozen feature set and needs an explicit instruction.
+2. **Book label definition**: keep the charter's vol-percentile label for
+   the book (consistent, but blind to a −17% fortnight), or add the
+   drawdown label already produced alongside it as the book's operating
+   target. Owner call; nothing changes until made.
+3. **Positions**: confirm whether the 2026-08-13 weights still describe
+   the book.
+
+
+4. Secure a data source with 20+ years of daily history and re-run Phases
    1–5 unchanged (the harness is source-agnostic); the 5-year cap is the
    main reason this report can't say anything stronger.
-2. Let the forward test run: refresh the snapshot periodically (new frozen
+5. Let the forward test run: refresh the snapshot periodically (new frozen
    version each time), run `predict_today.py` daily, and evaluate the
    forward record against persistence once it holds a few hundred rows
    (~2 years). No skill claim before then.
-3. If any deployment is contemplated meanwhile, the honest comparison is
+6. If any deployment is contemplated meanwhile, the honest comparison is
    against a static always-hedged overlay and the one-line trailing
    percentile rule, both of which matched or beat every model in-sample.

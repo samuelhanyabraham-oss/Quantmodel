@@ -24,6 +24,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from sklearn.preprocessing import StandardScaler
 
@@ -119,14 +120,27 @@ def cmd_predict() -> None:
     calibrate = models._fit_sigmoid_calibrator(
         model.predict_proba(scaler.transform(Xtr[cut:]))[:, 1], ytr[cut:])
 
+    latest = df.index.max()
+    # The OPERATIONAL inputs (book RV, its threshold, beta) must exist on the
+    # latest bar — refuse a stale reading. The model diagnostic may be
+    # unavailable (it needs VIX3M via vix_slope, undelivered since
+    # 2026-08-13); it is then logged as null, not as a stale number.
+    for col in ("brv10", "rv_thresh", "beta63"):
+        if pd.isna(df.loc[latest, col]):
+            raise SystemExit(f"REFUSED: {col} not computable on latest bar {latest.date()}")
     scorable = df[BOOK_FEATURES].dropna()
-    recent = scorable.iloc[-(RANK_WINDOW + 1):]
-    probs = calibrate(model.predict_proba(scaler.transform(recent.to_numpy(dtype=float)))[:, 1])
-    p_today = float(probs[-1])
-    rank = float(np.mean(probs[:-1] <= p_today))
-    beta = float(df["beta63"].dropna().iloc[-1])
-    brv = float(df["brv10"].dropna().iloc[-1])
-    thresh = float(df["rv_thresh"].dropna().iloc[-1])
+    if scorable.index[-1] == latest:
+        recent = scorable.iloc[-(RANK_WINDOW + 1):]
+        probs = calibrate(model.predict_proba(scaler.transform(recent.to_numpy(dtype=float)))[:, 1])
+        p_today = round(float(probs[-1]), 4)
+        rank = round(float(np.mean(probs[:-1] <= p_today)), 4)
+    else:
+        missing = [c for c in BOOK_FEATURES if pd.isna(df.loc[latest, c])]
+        print(f"model diagnostic unavailable on {latest.date()}: features {missing} missing")
+        p_today, rank = None, None
+    beta = float(df.loc[latest, "beta63"])
+    brv = float(df.loc[latest, "brv10"])
+    thresh = float(df.loc[latest, "rv_thresh"])
 
     # OPERATIONAL SIGNAL = the persistence rule on the book, not the model.
     # Book walk-forward (results/book_walk_forward.json): the fitted model
@@ -138,21 +152,25 @@ def cmd_predict() -> None:
     band = hedge_band_from_rank(0.75 if in_regime else 0.0)
 
     entry = {
-        "asof": str(recent.index[-1].date()),
+        "asof": str(latest.date()),
         "universe": "book",
         "signal_rule": "book_persistence (rv10 > trailing 1y q75)",
         "in_regime": bool(in_regime),
         "signal": int(in_regime),
         "band_lo": band[0], "band_hi": band[1],
-        "model_prob_diagnostic": round(p_today, 4),
-        "model_rank_diagnostic": round(rank, 4),
+        "model_prob_diagnostic": p_today,
+        "model_rank_diagnostic": rank,
         "book_rv10_ann": round(brv, 4),
         "book_regime_thresh": round(thresh, 4),
         "book_beta63_vs_spy": round(beta, 2),
         "spy_hedge_notional_per_100k_book": round(1e5 * (band[0] + band[1]) / 2 * beta),
         "config": "book-v1 persistence-operational, logistic diagnostic",
-        "label_resolves_after": str((recent.index[-1] + pd.tseries.offsets.BDay(labels.HORIZON)).date()),
+        "label_resolves_after": str((latest + pd.tseries.offsets.BDay(labels.HORIZON)).date()),
     }
+    from predict_today import already_logged  # same idempotency rule
+    if already_logged(entry["asof"], entry["config"], "book"):
+        print(json.dumps(entry, indent=2))
+        raise SystemExit(f"already logged for {entry['asof']} — not appended twice")
     with open(ROOT / "forward_test.jsonl", "a", encoding="utf-8") as fh:
         fh.write(json.dumps(entry, sort_keys=True) + "\n")
     experiment_log.log_run(

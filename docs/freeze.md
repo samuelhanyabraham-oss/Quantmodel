@@ -19,6 +19,20 @@ the forward test is well-defined and un-tunable.
   prediction to `forward_test.jsonl` before its label resolves. A skill
   claim requires the accumulated forward record to beat persistence under
   the same block-bootstrap + Bonferroni machinery — no other path exists.
+- **Refresh protocol (added 2026-09-30, no change to the frozen config):**
+  new bars enter only via `scripts/refresh_data.py`, which freezes a new
+  snapshot version after verifying the overlap with the frozen values.
+  Predictions refuse to run on a bar where a frozen feature is not
+  computable (staleness guard) and refuse to log the same (asof, config,
+  universe) twice (idempotency guard). `scripts/forward_test_score.py`
+  resolves labels for closed windows and writes
+  `results/forward_test_record.json`; it attempts no test below 60
+  resolved rows per universe and never claims skill itself.
+- **Standing blocker:** `vix_slope` needs VIX3M, which no reachable source
+  delivers after 2026-08-12. Substituting a proxy would change the frozen
+  feature set and is an owner decision, not an operational one; until then
+  the SPY forward test is paused and the book operational signal (which
+  needs no VIX3M) continues.
 
 ---
 
