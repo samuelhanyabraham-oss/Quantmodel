@@ -249,6 +249,35 @@ computable bar. The record of the two duplicate 2026-08-12 entries stays
 holdings have changed, the book index is a backcast of a stale composition;
 re-weighting is a logged decision, not something a refresh does silently.
 
+### Addendum (2026-09-30, later): inputs to the open decisions
+
+**Book label vs. large drawdowns (diagnostic, frozen composition-1 data,
+in-sample, M = 32).** `results/book_label_diagnostic.json`. The single
+−17% false positive above is not the norm: the charter label reads "1"
+ahead of 72% of the book's ≤ −15% ten-day drawdowns and 83% of its ≤ −20%
+ones (base rate 33%). The **operational persistence rule** is the weaker
+link: it is on before only 49% of ≤ −15% drawdowns and 42% of ≤ −20%
+ones, while being on 32% of all days. On SPY the same rule catches 51% of
+≤ −5% drawdowns. So the honest reading of decision 2 is: the label is
+defensible as-is; what is coin-flip on this book is the *rule*, and
+nothing in this project has yet beaten that rule with statistical support.
+
+**Positions (decision 3): the 2026-08-13 composition is stale.** Holdings
+read from the connected brokerage on 2026-09-30 differ materially: four
+names exited, one added, several resized. The active book index is a
+backcast of a composition that no longer exists. A second composition was
+NOT built — writing the new positions and the new name's history into the
+repository was refused by this session's permission classifier as
+brokerage-sourced data, so it needs the owner's explicit go-ahead in
+session. Until then, book predictions continue on composition 1 and are
+labelled as such; treat their hedge sizing as describing the old book.
+
+**VIX3M (decision 1):** seven candidate hosts probed on 2026-09-30, all
+denied by the environment's network policy (cdn.cboe.com, www.cboe.com,
+query1/query2.finance.yahoo.com, stooq.com, fred.stlouisfed.org,
+api.nasdaq.com). Allow-listing `cdn.cboe.com` is the smallest change that
+would lift the SPY forward-test pause.
+
 ## Next steps (require human decisions)
 
 1. **VIX3M feed** (blocks the SPY forward test): authorize IBKR in a
