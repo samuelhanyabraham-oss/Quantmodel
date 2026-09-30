@@ -23,6 +23,9 @@ N_BOOT = 2000
 
 
 def effective_n(n_rows: int, horizon: int = HORIZON) -> float:
+    """Original (2026-08-13) rule: n / HORIZON. Since the 2026-09-30
+    amendment this is reported as `effective_n_rule`; the headline
+    `effective_n` is effective_n_acf()."""
     return n_rows / horizon
 
 
@@ -110,10 +113,9 @@ def effective_n_acf(y: np.ndarray, max_lag: int = 250) -> float:
     """Autocorrelation-based effective sample size: n / (1 + 2 * sum of
     positive-run autocorrelations), i.e. n over the integrated autocorrelation
     time. Added 2026-09-30 after the long-panel check showed label
-    dependence persists ~80 days, so n / HORIZON (the frozen rule, kept and
-    reported first) overstates independent observations ~3x. Reported
-    alongside, never instead; changing the headline rule is a charter
-    amendment."""
+    dependence persists ~80 days, so n / HORIZON overstates independent
+    observations ~3x. Headline `effective_n` since the 2026-09-30 charter
+    amendment; the old rule is reported as `effective_n_rule`."""
     s = pd.Series(np.asarray(y, dtype=float))
     n = len(s)
     tau = 1.0

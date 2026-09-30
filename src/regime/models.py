@@ -54,6 +54,8 @@ def walk_forward_probs(
         tr, te = f.train_idx, f.test_idx
         cut = int(len(tr) * (1 - CAL_FRAC))
         fit_idx, cal_idx = tr[:cut], tr[cut:]
+        if len(np.unique(yv[fit_idx])) < 2:
+            continue  # degenerate fold (one class in training): no fit, probs stay NaN
         scaler = StandardScaler().fit(Xv[fit_idx])
         model = make_model(kind, seed)
         model.fit(scaler.transform(Xv[fit_idx]), yv[fit_idx])

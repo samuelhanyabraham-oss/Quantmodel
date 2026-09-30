@@ -79,8 +79,11 @@ def evaluate_strategy(
     return {
         "name": name,
         "n_rows": int(len(y)),
-        "effective_n": round(effective_n(len(y)), 1),
-        "effective_n_acf": round(effective_n_acf(y), 1),
+        # Amended 2026-09-30: headline effective N is autocorrelation-based
+        # (n / integrated autocorrelation time of the label); the original
+        # n / HORIZON rule is kept alongside as effective_n_rule.
+        "effective_n": round(effective_n_acf(y), 1),
+        "effective_n_rule": round(effective_n(len(y)), 1),
         "base_rate": round(float(np.mean(y)), 4),
         "auc": round(auc_pt, 4),
         "auc_ci90": [round(auc_lo, 4), round(auc_hi, 4)],

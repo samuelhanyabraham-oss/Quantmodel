@@ -59,10 +59,10 @@ record the composition they were predicted on and are scored against it.
 
 | item | why the scripts refuse to do it |
 |---|---|
-| VIX3M feed | frozen feature `vix_slope`; substituting a proxy changes the frozen feature set |
-| book re-weight (composition 2) | brokerage-sourced data write; composition is a logged decision, not a refresh side-effect |
-| cost-model parameters | charter amendment (`docs/cost_model.md`) |
-| effective-N headline rule | charter amendment (Validation section); `effective_n_acf` is reported beside `effective_n` until then |
+| VIX3M feed | frozen feature `vix_slope`; substituting a proxy changes the frozen feature set. Needs `cdn.cboe.com` allow-listed in the environment's network settings (still denied as of 2026-09-30 evening) |
+| book re-weight (new composition) | composition is a logged decision, not a refresh side-effect (composition 2 built 2026-09-30 on the owner's instruction) |
+| cost-model parameters | charter amendment (`docs/cost_model.md`; amended once, 2026-09-30, to 4 bp/day) |
+| effective-N headline rule | charter amendment (Validation section; amended 2026-09-30: headline is autocorrelation-based, `effective_n_rule` keeps n/10) |
 | any new model / feature set | must be pre-registered in writing and committed before it runs (`docs/long_history_plan.md` is the template) |
 
 ## Where the frozen state lives

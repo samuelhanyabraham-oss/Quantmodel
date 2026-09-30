@@ -137,7 +137,8 @@ def aggregate(rows: list[dict], frames: dict[str, pd.DataFrame]) -> dict:
                 "persistence_agreement": float(np.mean(s == ps)),
                 "nps_net_ann_signal": round(net_protection_score(s, ret), 5),
                 "nps_net_ann_persistence": round(net_protection_score(ps, ret), 5),
-                "effective_n_approx": round(len(rs) / labels.HORIZON, 1),
+                "effective_n_rule": round(len(rs) / labels.HORIZON, 1),
+                "effective_n": round(float(__import__("regime.stats", fromlist=["effective_n_acf"]).effective_n_acf(y)), 1) if len(rs) >= 3 else None,
                 "skill_test": "not attempted: n_resolved < MIN_ROWS_FOR_TEST" if len(rs) < MIN_ROWS_FOR_TEST else "see p_raw",
             })
             if len(rs) >= MIN_ROWS_FOR_TEST and len(set(y)) == 2:

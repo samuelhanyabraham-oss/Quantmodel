@@ -79,30 +79,39 @@ def cmd_evaluate() -> None:
     persist = df["persistence"].iloc[test_rows]
     res_p = evaluate.evaluate_strategy(persist, persist, test_df, name="book_persistence", seed=SEED)
     experiment_log.log_run(
-        {"strategy": "book_persistence", "type": "baseline", "universe": "book"},
+        {"strategy": "book_persistence", "type": "baseline", "universe": "book", "composition": book.active_composition()},
         res_p, seed=SEED, data_snapshot_hash=snap, notes="book walk-forward")
 
     probs = models.walk_forward_probs(df[BOOK_FEATURES], df["label"], "logistic", seed=SEED)
     p_te = probs.iloc[test_rows]
     roll_q = probs.rolling(RANK_WINDOW, min_periods=60).quantile(0.70)
     s_te = (probs >= roll_q).astype(float).iloc[test_rows]
-    res_m = evaluate.evaluate_strategy(p_te, s_te, test_df, name="book_logistic_adaptive", seed=SEED)
+    # A fold whose training rows hold a single class is skipped by
+    # walk_forward_probs (probs NaN there); the model is scored on the
+    # remaining test rows only, and the count is recorded.
+    ok = p_te.notna().to_numpy()
+    res_m = evaluate.evaluate_strategy(p_te[ok], s_te[ok], test_df[ok], name="book_logistic_adaptive", seed=SEED)
+    res_m["test_rows_skipped_degenerate_fold"] = int((~ok).sum())
     diff, p_raw = evaluate.auc_diff_pvalue(
-        test_df["label"].to_numpy(), p_te.to_numpy(), persist.to_numpy(dtype=float), seed=SEED)
+        test_df["label"].to_numpy()[ok], p_te.to_numpy()[ok], persist.to_numpy(dtype=float)[ok], seed=SEED)
     res_m["auc_minus_persistence"] = round(diff, 4)
     res_m["p_raw_vs_persistence"] = round(p_raw, 4)
     experiment_log.log_run(
         {"strategy": "book_logistic_adaptive", "type": "model", "universe": "book",
-         "features": BOOK_FEATURES}, res_m, seed=SEED, data_snapshot_hash=snap,
+         "composition": book.active_composition(), "features": BOOK_FEATURES}, res_m, seed=SEED, data_snapshot_hash=snap,
         notes="book walk-forward, adaptive q70 operating point")
     M = experiment_log.run_count()
     res_m["run_count_M"] = M
     res_m["p_bonferroni"] = round(min(1.0, p_raw * M), 4)
 
-    out = {"book_persistence": res_p, "book_logistic_adaptive": res_m}
+    comp = book.active_composition()
+    out = {"composition": comp, "book_hash": snap, "book_persistence": res_p, "book_logistic_adaptive": res_m}
     (ROOT / "results").mkdir(exist_ok=True)
-    (ROOT / "results" / "book_walk_forward.json").write_text(json.dumps(out, indent=2) + "\n")
+    name = "book_walk_forward.json" if comp == 1 else f"book_walk_forward_c{comp}.json"
+    (ROOT / "results" / name).write_text(json.dumps(out, indent=2) + "\n")
     for k, r in out.items():
+        if not isinstance(r, dict):
+            continue
         print(f"{k:24s} AUC={r['auc']:.3f} {r['auc_ci90']} Brier={r['brier']:.3f} "
               f"NPS={r['nps_net_ann']:+.4f} on={r['hedge_on_frac']:.2f} FNrate={r['false_negative_rate']:.2f}")
     print(f"model vs book-persistence: AUC diff {res_m['auc_minus_persistence']:+.4f} "

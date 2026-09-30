@@ -221,3 +221,13 @@ make the rules "decisively negative" (they keep ~+1%/yr) but it does halve
 the constant's edge. Realistic carry for rolled 5%-OTM 1–3-month index puts
 is on the order of 3–4 bp/day, which is exactly the region where the
 ranking flips. Decision 3 (cost-model amendment) now has its numbers.
+
+
+## Recost under the 2026-09-30 cost amendment (`results/recost_4bp.json`, M = 55 after)
+
+Every L2/L3/L4 strategy re-derived (AUCs reproduced exactly) and scored at
+2 and 4 bp/day: always-hedged +7.6% → +2.5%; persistence +2.3% → +1.1%;
+trailing pctl +2.8% → +0.9%; L3 logistic +1.4% → −0.2%; L4 logistic +0.8% →
+−0.9%; L4 gbm +0.6% → −1.2%. Timing-test conclusions unchanged (rules p ≈
+0.004–0.006; models 0.009–0.06). Verdicts unchanged: no model beats the
+rule on AUC, and now none is net-positive either.

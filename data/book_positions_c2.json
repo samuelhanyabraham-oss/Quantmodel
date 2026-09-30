@@ -1,0 +1,23 @@
+{
+  "asof": "2026-09-30",
+  "composition": 2,
+  "note": "Owner's combined holdings (individual margin + Roth IRA) read 2026-09-30 15:47 UTC, built on the owner's instruction ('sounds good do that then', 2026-09-30) after the report flagged the 2026-08-13 weights as stale. Versus composition 1: IREN, CLSK, BTDR, DRAM fully exited; STM new; SNDK 15 -> 48; NBIS 211 -> 300; APLD 400 -> 600; CRWV 200 -> 250; SHAZ 607 -> 800; TE 1068 -> 70. GPUSB (private program stock, no market data) excluded. Weights are CURRENT market-value weights at the 2026-09-29 official close, projected back through history (same documented assumption as composition 1). Composition 1 is retained untouched; entries logged under it are scored against it.",
+  "source": "Robinhood MCP get_equity_positions (shares) and get_equity_quotes official prior-session close (last_close); STM daily history via get_equity_historicals saved as data/raw/refresh_2026-09-30/book_bars_batch3_STM.csv",
+  "excluded": ["GPUSB (no market data)"],
+  "shares": {
+    "NBIS": 300.0,
+    "APLD": 600.0,
+    "CRWV": 250.0,
+    "SNDK": 48.0,
+    "SHAZ": 800.0,
+    "STM": 300.0,
+    "CORZ": 27.5,
+    "KEEL": 206.0,
+    "TE": 69.8
+  },
+  "last_close": {
+    "date": "2026-09-29",
+    "NBIS": 237.355, "APLD": 25.41, "CRWV": 85.93, "SNDK": 1729.76, "SHAZ": 54.17,
+    "STM": 53.24, "CORZ": 16.31, "KEEL": 3.58, "TE": 3.77
+  }
+}

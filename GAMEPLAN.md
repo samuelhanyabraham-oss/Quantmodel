@@ -37,8 +37,12 @@ cycle; book compositions are versioned and rebuildable from a positions
 file. An adversarial code review found and fixed four bugs (one
 pre-existing; REPORT erratum). M = 45.
 
-**Open owner decisions:** VIX3M feed (network allow-list), a positions file
-for book composition 2, cost-model bleed amendment, effective-N headline rule.
+**Status (2026-09-30, evening):** owner approved all four items. Done: cost
+model amended to 4 bp/day (all comparisons re-costed; models now
+net-negative, rules still positive), effective N now autocorrelation-based,
+book composition 2 built and activated from current holdings (persistence
+AUC 0.63, +13%/yr net, timing p 0.0005; model anti-skill). Still blocked:
+VIX3M — cdn.cboe.com re-probed and still denied by the network policy. M = 58.
 
 The ordering principle: **everything that could flatter a result is built and
 frozen before any model exists.** Harness → data → labels/baselines/validation →

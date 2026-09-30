@@ -383,6 +383,47 @@ until bleed exceeds ~4.8 bp/day. The book composition is versioned
 (`book_pipeline.py build --composition N --positions ...`) and waits on a
 positions file from the owner.
 
+## Charter amendments and book composition 2 (2026-09-30, owner-authorized)
+
+The owner approved the four items put to them ("sounds good do that then").
+Three were done; the fourth (VIX3M) still needs the network allow-list.
+
+**Amendment 1 — cost model bleed 2 → 4 bp/day** (`docs/cost_model.md`,
+charter changelog). Every affected comparison re-derived and re-costed
+(`results/recost_4bp.json`; the L3/L4 AUCs reproduced exactly, confirming
+determinism). Under the amended yardstick:
+
+| strategy (long panel test rows) | NPS @2 bp | **NPS @4 bp** | timing excess @4 bp / p |
+|---|---|---|---|
+| always hedged | +7.6% | **+2.5%** | 0 |
+| persistence | +2.3% | **+1.1%** | +1.7% / 0.004 |
+| trailing pctl | +2.8% | **+0.9%** | +1.7% / 0.006 |
+| L3 logistic (3f) | +1.4% | **−0.2%** | +1.0% / 0.009 |
+| L4 logistic (16f) | +0.8% | **−0.9%** | +0.8% / 0.03 |
+| L4 gbm (16f) | +0.6% | **−1.2%** | +0.7% / 0.06 |
+
+The amendment does not rescue anything: the constant still leads, the
+rules stay modestly positive, and every fitted model goes net-negative.
+Book composition 1 persistence: +19.4% → +17.6%/yr.
+
+**Amendment 2 — effective N is now autocorrelation-based** (`effective_n`;
+the old n/10 rule stays as `effective_n_rule`). Read every earlier
+"effective N" in this report as the old rule.
+
+**Book composition 2 built and activated** (`data/book_positions_c2.json`,
+`data/BOOK_C2_MANIFEST.json`, hash-locked; composition 1 retained). Current
+holdings: SNDK 33%, NBIS 28%, SHAZ 17%, CRWV 9%, STM 6%, APLD 6%, KEEL,
+CORZ, TE < 1% each. The new book runs ~59% annualized vol, worst day −41%,
+max drawdown −74%, and sits 27% below its sample peak. Walk-forward on it
+(M = 58, amended cost): **persistence AUC 0.634 [0.563, 0.700], net NPS
++13.2%/yr, hedge-on 39%, timing +6.8%/yr over its null (p ≈ 0.0005)**;
+the fitted logistic model is anti-skill (AUC 0.44) with 168 test rows
+unscorable because the first training fold contains no regime-on label.
+Effective N ≈ 26 (rule: 84) — read the CI accordingly. Reading logged for
+2026-09-29: rv10 48% vs threshold 91%, rank 0.10, **out of regime, band
+0–10%**, beta to SPY 4.58 (≈ $23k SPY-equivalent short per $100k of book at
+the band midpoint if the band were on).
+
 ## Erratum (2026-09-30): baseline warm-up bug, audited
 
 An adversarial review of the code found that `run_experiments.py` and

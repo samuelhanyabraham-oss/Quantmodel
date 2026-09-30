@@ -1,11 +1,13 @@
 {
-  "scored_utc": "2026-09-30T19:43:56.806580+00:00",
+  "scored_utc": "2026-09-30T19:59:57.832239+00:00",
   "panel_hash": "03e4e049ed307ffd2f29deee58d192ead672fe155b31ad2ec5a9db99c1289b95",
   "book_hashes": {
+    "c2": "66b12d07bf06461a50bf96611bd79ef76b5df6579e2829f29834ad4cfbe12b09",
     "c1": "116e0eeb2fc83224359b5e30910b202044180f88eafa4a8195dec39e08ce8668"
   },
   "latest_bar": {
     "SPY": "2026-09-29",
+    "book_c2": "2026-09-29",
     "book_c1": "2026-09-29"
   },
   "duplicate_entries_ignored": 2,
@@ -28,7 +30,8 @@
       "persistence_agreement": 1.0,
       "nps_net_ann_signal": 0.0,
       "nps_net_ann_persistence": 0.0,
-      "effective_n_approx": 0.1,
+      "effective_n_rule": 0.1,
+      "effective_n": null,
       "skill_test": "not attempted: n_resolved < MIN_ROWS_FOR_TEST"
     },
     "SPY | freeze-v3 persistence-operational, logistic_small4 diagnostic": {
@@ -41,6 +44,13 @@
     "book | book-c1 freeze-v3 persistence-operational, logistic diagnostic": {
       "universe": "book",
       "config": "book-c1 freeze-v3 persistence-operational, logistic diagnostic",
+      "n_logged": 1,
+      "n_resolved": 0,
+      "n_pending": 1
+    },
+    "book | book-c2 freeze-v3 persistence-operational, logistic diagnostic": {
+      "universe": "book",
+      "config": "book-c2 freeze-v3 persistence-operational, logistic diagnostic",
       "n_logged": 1,
       "n_resolved": 0,
       "n_pending": 1
@@ -61,8 +71,9 @@
       "false_positives_bleed_in_calm": 0,
       "persistence_agreement": 0.0,
       "nps_net_ann_signal": 0.0,
-      "nps_net_ann_persistence": 1.16172,
-      "effective_n_approx": 0.1,
+      "nps_net_ann_persistence": 1.11132,
+      "effective_n_rule": 0.1,
+      "effective_n": null,
       "skill_test": "not attempted: n_resolved < MIN_ROWS_FOR_TEST"
     },
     "book | book-v1 persistence-operational, logistic diagnostic": {
@@ -80,9 +91,10 @@
       "false_negatives_unhedged_into_regime": 0,
       "false_positives_bleed_in_calm": 1,
       "persistence_agreement": 1.0,
-      "nps_net_ann_signal": 1.16172,
-      "nps_net_ann_persistence": 1.16172,
-      "effective_n_approx": 0.1,
+      "nps_net_ann_signal": 1.11132,
+      "nps_net_ann_persistence": 1.11132,
+      "effective_n_rule": 0.1,
+      "effective_n": null,
       "skill_test": "not attempted: n_resolved < MIN_ROWS_FOR_TEST"
     }
   },
@@ -173,6 +185,18 @@
       "universe": "book",
       "book_composition": 1,
       "config": "book-c1 freeze-v3 persistence-operational, logistic diagnostic",
+      "signal": 0,
+      "band": [
+        0.0,
+        0.1
+      ],
+      "resolved": false
+    },
+    {
+      "asof": "2026-09-29",
+      "universe": "book",
+      "book_composition": 2,
+      "config": "book-c2 freeze-v3 persistence-operational, logistic diagnostic",
       "signal": 0,
       "band": [
         0.0,
