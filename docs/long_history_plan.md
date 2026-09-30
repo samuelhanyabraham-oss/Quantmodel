@@ -124,3 +124,27 @@ only thing the long history adds beyond "no skill" is the (better)
 calibration the Brier score shows, which has no cash value under the
 frozen cost model. The 2021–26 in-sample result (`REPORT.md`) is now
 classified as sample luck.
+
+## L4 — pre-registered (written 2026-09-30 after L3, before any L4 number exists)
+
+**Question.** L3 used three features and equalled persistence. Do the
+charter's remaining boring features carry information beyond trailing
+realized vol at effective N ≈ 600 — and does anything *lead*?
+
+**Exact spec.**
+- Panel `panel_long_v1`. Feature set = every `features.FEATURE_NAMES`
+  entry computable without VIX3M or HYG (so the sample starts 2003, not
+  2008): `rv10, rv21, rv63, rv10_chg5, rv_ratio_10_63, volofvol21, vix,
+  vix_chg5, vrp, qqq_rv10, iwm_rv10, dd_from_peak63, ret21, ret5, skew63,
+  range5` (16 features; `vix_slope`, `credit_ratio_chg21`,
+  `credit_ratio_chg5` excluded). Nothing added, no selection.
+- Two runs, both via `models.walk_forward_probs` unchanged: `logistic`
+  (C=0.1, balanced) and `gbm` (depth 2, 100 iters, lr 0.05, leaf 20, l2 1),
+  seed 20260813, 10 purged folds, Platt tail-25% calibration per fold.
+- Operating point: adaptive rank q70 / w126 (min 60), frozen bands.
+- Reported: charter metric set + timing test (new, supplementary) + per
+  fold + per stress window + lead time vs persistence.
+- Decision rule (unchanged): skill only if p_adj < 0.10 vs persistence
+  (Bonferroni over M at run time, M = 39 after these two are logged) AND
+  net NPS > both computable baselines. Timing p and lead time are
+  descriptive. Whatever happens, no third feature set, no tuning.
