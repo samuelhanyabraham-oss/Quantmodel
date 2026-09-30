@@ -1,0 +1,98 @@
+# Long-history replication — plan and pre-registration (2026-09-30)
+
+Owner instruction: "your goal is to research." Charter next step #1:
+"secure a data source with 20+ years of daily history and re-run the
+harness unchanged." This document is written and committed BEFORE any
+result on the long panel exists, so nothing below can be tuned to one.
+
+## L1 — Data (done in this commit)
+
+`data/snapshots/panel_long_v1.csv`, hash in `data/LONG_MANIFEST.json`.
+2000-01-03 → 2026-09-29 (6,722 SPY trading days); VIX from 2002-05-10;
+HYG from 2007-04-11; VIX3M only 2021-08-16 → 2026-08-12. Source and
+repair policy in `regime/long_history.py` and the manifest: 32 SPY closes
+repaired against the S&P 500 index (vendor print errors > 1% off the
+index-implied price), 2 IWM half-price bars removed. The frozen 2021+
+segment is appended verbatim and verified on the overlap.
+
+## L2 — Baselines on the long panel (this commit, results below the line)
+
+Purged walk-forward (10-day embargo + purge, 10 folds ≈ 2.5 years each),
+baselines 1 and 3 (persistence; trailing percentile), pooled over test
+folds and per fold, plus NPS inside named stress windows. Baseline 2
+(term structure) needs VIX3M and is reported only on the 2021+ segment.
+Effective N, block-bootstrap 90% CIs, frozen cost model. Logged.
+
+## L3 — One pre-registered model check (NOT yet run at commit time)
+
+**Question:** does the frozen freeze-v2 *procedure* — minus the one
+feature the long history cannot supply — beat persistence net across
+2002–2026, or was the 2021–26 result sample luck?
+
+**Exact spec (no choices left open):**
+- Panel: `panel_long_v1` (hash above). Rows: SPY and VIX both present,
+  label defined → starts ~2003-05 (252-day warm-up after VIX's first print).
+- Features: `[rv10, vix, rv_ratio_10_63]` — freeze v2's set with
+  `vix_slope` dropped because VIX3M does not exist before 2021. Nothing added.
+- Model: logistic, C = 0.1, balanced class weights, StandardScaler fit on
+  each training fold, Platt calibration on the chronological tail 25% of
+  each training fold, seed 20260813 (`models.make_model("logistic")`,
+  unchanged).
+- Validation: `purged_walk_forward(n, n_folds=10)`, embargo 10, purge 10.
+- Operating point: adaptive rank — signal on when the probability exceeds
+  the 70th percentile of its trailing 126 values (min 60). Bands per
+  `hedge_band_from_rank`. Unchanged from freeze v2.
+- Comparison: AUC vs persistence on pooled test rows, one-sided block
+  bootstrap p; NPS net vs persistence and vs trailing percentile; per-fold
+  and per-stress-window NPS. Bonferroni over M = the `experiments.jsonl`
+  count at run time. Decision rule unchanged: skill claimed only if
+  p_adj < 0.10 AND net NPS exceeds both computable baselines.
+- **One run.** No second feature set, no second model, no threshold scan.
+  If it fails, the report says the 2021–26 result did not replicate.
+
+Anything else run on the long panel after this is a new, separately
+pre-registered experiment and counts toward M like everything else.
+
+---
+
+## L2 results (run 2026-09-30, `results/long_baselines.json`, M = 35 after these runs)
+
+6,451 labelled rows 2001-01 → 2026-09, 10 purged folds, **effective N ≈ 630**
+(vs ≈ 46 in the original study). Base rate 25.7%.
+
+| strategy | AUC [90% CI] | Brier | NPS net (ann.) | hedge-on | FN rate | onsets missed |
+|---|---|---|---|---|---|---|
+| persistence | 0.714 [0.684, 0.744] | 0.212 | +2.29% | 24% | 0.44 | 111 / 136 |
+| trailing pctl | 0.710 [0.682, 0.739] | 0.284 | +2.79% | 38% | 0.30 | 84 / 136 |
+| term structure (2021+ only) | 0.562 [0.532, 0.593] | 0.251 | −0.87% | 5% | 0.86 | 32 / 32 |
+| **always hedged** | — | — | **+7.56%** | 100% | 0 | 0 |
+| never hedged | — | — | 0 | 0% | 1 | all |
+
+What this says, bluntly:
+
+1. **The baselines are real and stable.** Persistence's AUC of 0.71 on 630
+   effective observations is the first number in this project with a tight
+   CI. Over 25 years both one-line rules are net-positive (they were
+   net-negative on the mostly calm 2021–24 window). Every "model" result
+   in REPORT.md must now be read against 0.71, not 0.60.
+2. **The frozen cost model is dominated by a constant.** Under
+   `docs/cost_model.md`, hedging every day scores +7.6%/yr and beats both
+   rules in every fold and every stress window. NPS credits half of every
+   negative forward 10-day return while charging 2 bp/day; over any long
+   sample of SPY that is a net subsidy to being hedged. NPS therefore
+   rewards hedge-on fraction as much as timing. The cost model is frozen
+   (changing it is a charter amendment); this is recorded as a Section-1
+   "why this might be wrong" item, and a **supplementary** diagnostic is
+   proposed, not adopted: *timing value* = NPS(signal) − hedge_on ×
+   NPS(always). Persistence: +0.48%/yr; trailing pctl: −0.08%/yr. I.e. the
+   rules add almost nothing beyond a static hedge of the same average size.
+3. **Lead time is structurally absent.** Persistence fires after realized
+   vol has already risen; it misses 82% of regime onsets under the
+   charter's lead-time definition and catches the rest with a median 8-day
+   run-up. Any model must be judged on whether it *leads*.
+4. **Stress windows:** both rules were on and net-positive in every named
+   episode (GFC +32%/+45%, COVID +49%, 2022 +11%/+16%), but always-hedged
+   beat them in each. Outside the ten windows (74% of days, base rate 18%)
+   both rules are slightly net-negative.
+
+L3 is run next, once, exactly as pre-registered above.

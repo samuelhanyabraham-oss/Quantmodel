@@ -171,6 +171,9 @@ def frozen_hashes() -> set[str]:
         out.add(m["full_sha256"])
     for v in m.get("versions", []):
         out.add(v["sha256"])
+    long_manifest = ROOT / "data" / "LONG_MANIFEST.json"
+    if long_manifest.exists():
+        out.add(json.loads(long_manifest.read_text())["sha256"])
     return out
 
 

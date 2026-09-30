@@ -1,0 +1,262 @@
+{
+  "created_utc": "2026-09-30T15:58:44.009155+00:00",
+  "path": "panel_long_v1.csv",
+  "sha256": "76eeb00bbf24ef81e4ee3ad786fc0296eaeb4eb18476fa92fd9d2dc38c9e5051",
+  "rows": 6722,
+  "start": "2000-01-03",
+  "end": "2026-09-29",
+  "frozen_segment_from": "2021-08-16",
+  "frozen_segment_hash": "03e4e049ed307ffd2f29deee58d192ead672fe155b31ad2ec5a9db99c1289b95",
+  "overlap_rows_verified": 4,
+  "source_long": "Robinhood MCP get_equity_historicals (SPY/QQQ/IWM/HYG/LQD, day bars, RTH, split-adjusted; 2000-01-01 -> 2021-08-19 in decade chunks) and get_index_historicals (VIX, SPX; 2-year chunks). Pulled 2026-09-30.",
+  "check_series": "SPX (S&P 500 index) used only to validate SPY prints; not a panel column",
+  "coverage": {
+    "SPY": {
+      "first": "2000-01-03",
+      "last": "2026-09-29",
+      "rows": 6722
+    },
+    "QQQ": {
+      "first": "2000-01-03",
+      "last": "2026-09-29",
+      "rows": 6722
+    },
+    "IWM": {
+      "first": "2000-05-26",
+      "last": "2026-09-29",
+      "rows": 6621
+    },
+    "HYG": {
+      "first": "2007-04-11",
+      "last": "2026-09-29",
+      "rows": 4896
+    },
+    "LQD": {
+      "first": "2002-07-26",
+      "last": "2026-09-29",
+      "rows": 6080
+    },
+    "VIX": {
+      "first": "2002-05-10",
+      "last": "2026-09-29",
+      "rows": 6133
+    },
+    "VIX3M": {
+      "first": "2021-08-16",
+      "last": "2026-08-12",
+      "rows": 1253
+    }
+  },
+  "spy_dev_tol": 0.01,
+  "spike_tol": 0.25,
+  "repairs": {
+    "spy_index_check": [
+      {
+        "date": "2000-01-06",
+        "vendor_close": 137.75,
+        "repaired_close": 140.5814,
+        "deviation": -0.02014
+      },
+      {
+        "date": "2000-02-24",
+        "vendor_close": 133.81,
+        "repaired_close": 135.6897,
+        "deviation": -0.01385
+      },
+      {
+        "date": "2000-04-04",
+        "vendor_close": 145.75,
+        "repaired_close": 149.7934,
+        "deviation": -0.02699
+      },
+      {
+        "date": "2000-04-14",
+        "vendor_close": 138.38,
+        "repaired_close": 136.0485,
+        "deviation": 0.01714
+      },
+      {
+        "date": "2000-12-08",
+        "vendor_close": 133.97,
+        "repaired_close": 137.3128,
+        "deviation": -0.02434
+      },
+      {
+        "date": "2005-04-26",
+        "vendor_close": 116.342,
+        "repaired_close": 115.1523,
+        "deviation": 0.01033
+      },
+      {
+        "date": "2005-05-04",
+        "vendor_close": 116.2244,
+        "repaired_close": 117.6945,
+        "deviation": -0.01249
+      },
+      {
+        "date": "2005-09-29",
+        "vendor_close": 121.42,
+        "repaired_close": 122.8572,
+        "deviation": -0.0117
+      },
+      {
+        "date": "2005-10-24",
+        "vendor_close": 118.0291,
+        "repaired_close": 120.0042,
+        "deviation": -0.01646
+      },
+      {
+        "date": "2005-11-02",
+        "vendor_close": 120.3859,
+        "repaired_close": 121.6315,
+        "deviation": -0.01024
+      },
+      {
+        "date": "2008-09-11",
+        "vendor_close": 123.6887,
+        "repaired_close": 125.2792,
+        "deviation": -0.0127
+      },
+      {
+        "date": "2008-09-19",
+        "vendor_close": 124.12,
+        "repaired_close": 125.9833,
+        "deviation": -0.01479
+      },
+      {
+        "date": "2008-09-23",
+        "vendor_close": 120.5541,
+        "repaired_close": 119.2728,
+        "deviation": 0.01074
+      },
+      {
+        "date": "2008-10-10",
+        "vendor_close": 88.5,
+        "repaired_close": 89.8864,
+        "deviation": -0.01542
+      },
+      {
+        "date": "2008-10-13",
+        "vendor_close": 101.35,
+        "repaired_close": 100.2952,
+        "deviation": 0.01052
+      },
+      {
+        "date": "2008-10-22",
+        "vendor_close": 90.64,
+        "repaired_close": 89.6363,
+        "deviation": 0.0112
+      },
+      {
+        "date": "2008-10-27",
+        "vendor_close": 83.95,
+        "repaired_close": 85.1246,
+        "deviation": -0.0138
+      },
+      {
+        "date": "2008-11-10",
+        "vendor_close": 93.3146,
+        "repaired_close": 92.2989,
+        "deviation": 0.011
+      },
+      {
+        "date": "2008-11-14",
+        "vendor_close": 86.62,
+        "repaired_close": 87.7345,
+        "deviation": -0.0127
+      },
+      {
+        "date": "2008-11-20",
+        "vendor_close": 81.0007,
+        "repaired_close": 75.5888,
+        "deviation": 0.0716
+      },
+      {
+        "date": "2008-11-21",
+        "vendor_close": 75.8341,
+        "repaired_close": 80.3696,
+        "deviation": -0.05643
+      },
+      {
+        "date": "2008-12-15",
+        "vendor_close": 88.4872,
+        "repaired_close": 87.1024,
+        "deviation": 0.0159
+      },
+      {
+        "date": "2009-01-02",
+        "vendor_close": 90.2722,
+        "repaired_close": 93.1457,
+        "deviation": -0.03085
+      },
+      {
+        "date": "2009-01-14",
+        "vendor_close": 87.2194,
+        "repaired_close": 84.2666,
+        "deviation": 0.03504
+      },
+      {
+        "date": "2009-01-27",
+        "vendor_close": 83.7257,
+        "repaired_close": 84.5972,
+        "deviation": -0.0103
+      },
+      {
+        "date": "2009-01-29",
+        "vendor_close": 87.4901,
+        "repaired_close": 84.5509,
+        "deviation": 0.03476
+      },
+      {
+        "date": "2009-01-30",
+        "vendor_close": 84.5976,
+        "repaired_close": 82.624,
+        "deviation": 0.02389
+      },
+      {
+        "date": "2009-02-05",
+        "vendor_close": 83.3782,
+        "repaired_close": 84.6929,
+        "deviation": -0.01552
+      },
+      {
+        "date": "2009-02-12",
+        "vendor_close": 82.2,
+        "repaired_close": 83.7454,
+        "deviation": -0.01845
+      },
+      {
+        "date": "2009-02-20",
+        "vendor_close": 78.2565,
+        "repaired_close": 77.3334,
+        "deviation": 0.01194
+      },
+      {
+        "date": "2009-07-16",
+        "vendor_close": 93.11,
+        "repaired_close": 94.0918,
+        "deviation": -0.01043
+      },
+      {
+        "date": "2009-11-05",
+        "vendor_close": 104.84,
+        "repaired_close": 106.8625,
+        "deviation": -0.01893
+      }
+    ],
+    "feature_etf_spikes": [
+      {
+        "symbol": "IWM",
+        "date": "2005-02-17",
+        "vendor_close": 62.93
+      },
+      {
+        "symbol": "IWM",
+        "date": "2005-02-24",
+        "vendor_close": 62.495
+      }
+    ]
+  },
+  "n_spy_repaired": 32,
+  "n_spike_repaired": 2
+}
