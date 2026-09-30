@@ -14,6 +14,7 @@ the overlap factor. Two tools, used everywhere and documented once here:
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 
 from .labels import HORIZON
 
@@ -98,3 +99,22 @@ def timing_value_test(
         "p_one_sided": round(float(np.mean(null >= observed)), 4),
         "n_perm": n_perm,
     }
+
+
+def effective_n_acf(y: np.ndarray, max_lag: int = 250) -> float:
+    """Autocorrelation-based effective sample size: n / (1 + 2 * sum of
+    positive-run autocorrelations), i.e. n over the integrated autocorrelation
+    time. Added 2026-09-30 after the long-panel check showed label
+    dependence persists ~80 days, so n / HORIZON (the frozen rule, kept and
+    reported first) overstates independent observations ~3x. Reported
+    alongside, never instead; changing the headline rule is a charter
+    amendment."""
+    s = pd.Series(np.asarray(y, dtype=float))
+    n = len(s)
+    tau = 1.0
+    for k in range(1, min(max_lag, n - 2) + 1):
+        r = s.autocorr(k)
+        if not np.isfinite(r) or r <= 0:
+            break
+        tau += 2.0 * r
+    return n / tau

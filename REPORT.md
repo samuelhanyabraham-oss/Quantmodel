@@ -325,6 +325,16 @@ timing is real (persistence +1.6%/yr over its null, p ≈ 0.004) and the
 models' is weaker (+0.8%, p 0.03–0.06): fitting loses timing information
 the rule already has. Details: `docs/long_history_plan.md`.
 
+**Harness self-checks (M = 39, `docs/long_history_plan.md`):** label
+dependence lasts ~80 trading days (integrated autocorrelation time 33 d),
+so the n/10 effective-N rule overstates independence ~3× (≈194, not 645,
+on the long panel); the block-bootstrap CIs are only ~12% too narrow. The
+harness now reports the autocorrelation-based count alongside. Cost
+sensitivity: always-hedged breaks even at 5.0 bp/day and the one-line
+rules overtake it only above ~4.8 bp/day; at the charter's 4 bp falsifier
+the rules keep ~+1%/yr. The bleed parameter, not the models, decides
+whether timing has cash value under this yardstick.
+
 Section 1 and Section 2 stand unchanged. Section 2's falsifier
 "if the walk-forward advantage does not replicate across 2008 / 2011 /
 2015 / 2018 / 2020 stress regimes, the current numbers were sample luck"

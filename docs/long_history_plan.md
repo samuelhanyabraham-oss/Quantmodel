@@ -186,3 +186,38 @@ and less decisively.
 Closed questions after L2–L4 (all pre-registered, M = 38): on 25 years the
 charter's feature set, with linear or small-tree models, does not beat
 persistence; the project's negative result stands with tight intervals.
+
+## Harness self-checks on the long panel (2026-09-30, `results/long_diagnostics.json`, M = 39)
+
+**Dependence.** Label autocorrelation: 0.89 at lag 1, 0.43 at lag 10,
+0.25 at lag 20, 0.07 at lag 60, first non-positive at lag 80. Integrated
+autocorrelation time ≈ 33 days ⇒ autocorrelation-based effective N ≈ **194**
+on 6,451 rows, versus 645 under the frozen n/10 rule. The block bootstrap
+is more robust than the count: persistence's AUC 90% CI widens only from
+0.060 (block 20) to 0.067 (block 250), +12%. Consequences: (a) every
+"effective N" printed so far overstates independence roughly 3×; the
+harness now reports `effective_n_acf` beside it, and the plan-level
+recommendation is to make the autocorrelation-based number the headline
+(a charter amendment, owner's call); (b) CIs reported with 20-day blocks
+should be read as ~10–15% too narrow — not enough to change any verdict
+here, since every model-vs-persistence gap is a rounding error.
+
+**Cost-model sensitivity** (test rows, capture 0.5 unless stated):
+
+| bleed (bp/day) | always hedged | persistence | trailing pctl |
+|---|---|---|---|
+| 2 (frozen) | +7.6% | +2.3% | +2.8% |
+| 3 | +5.0% | +1.7% | +1.8% |
+| 4 (charter falsifier) | +2.5% | +1.1% | +0.9% |
+| 5 | 0.0% | +0.4% | −0.1% |
+| 6 | −2.5% | −0.2% | −1.1% |
+
+Break-even bleed: always-hedged 5.0 bp; persistence 5.7 bp; trailing 4.9
+bp. Persistence beats always-hedged only from **4.8 bp/day** (3.5 bp at
+capture 0.35). The mean negative part of SPY's forward 10-day return is
+1.0%, i.e. the frozen model credits a constant hedge 5 bp/day of
+protection against 2 bp of bleed. The charter's 4 bp falsifier does not
+make the rules "decisively negative" (they keep ~+1%/yr) but it does halve
+the constant's edge. Realistic carry for rolled 5%-OTM 1–3-month index puts
+is on the order of 3–4 bp/day, which is exactly the region where the
+ranking flips. Decision 3 (cost-model amendment) now has its numbers.

@@ -79,3 +79,13 @@ def test_timing_test_is_calibrated_on_noise_and_detects_real_timing():
     oracle = (r < 0).astype(float)
     res = timing_value_test(oracle, r, net_protection_score, n_perm=400, seed=1)
     assert res["p_one_sided"] < 0.01 and res["excess_over_null"] > 0
+
+
+def test_effective_n_acf_matches_iid_and_shrinks_under_dependence():
+    from regime.stats import effective_n_acf
+    rng = np.random.default_rng(5)
+    iid = rng.integers(0, 2, 4000)
+    assert 0.85 * 4000 < effective_n_acf(iid) <= 4000 * 1.05
+    # a label that switches state every ~40 days: far fewer independent obs
+    blocks = np.repeat(rng.integers(0, 2, 100), 40)
+    assert effective_n_acf(blocks) < 4000 / 15

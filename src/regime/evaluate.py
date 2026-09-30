@@ -13,7 +13,7 @@ from sklearn.metrics import brier_score_loss, precision_score, recall_score, roc
 
 from .costs import net_protection_score
 from .labels import HORIZON
-from .stats import block_bootstrap_ci, effective_n, timing_value_test
+from .stats import block_bootstrap_ci, effective_n, effective_n_acf, timing_value_test
 
 
 def auc(y: np.ndarray, p: np.ndarray) -> float:
@@ -80,6 +80,7 @@ def evaluate_strategy(
         "name": name,
         "n_rows": int(len(y)),
         "effective_n": round(effective_n(len(y)), 1),
+        "effective_n_acf": round(effective_n_acf(y), 1),
         "base_rate": round(float(np.mean(y)), 4),
         "auc": round(auc_pt, 4),
         "auc_ci90": [round(auc_lo, 4), round(auc_hi, 4)],
