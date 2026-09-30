@@ -48,3 +48,25 @@ def hedge_band(p: float) -> tuple[float, float]:
         if p >= cut:
             lo, hi = b_lo, b_hi
     return lo, hi
+
+
+# Freeze v3 (2026-09-30): the operational SPY signal is the persistence
+# rule; its continuous score is the trailing-252 percentile rank of rv10.
+# 0.75 is the rule's (and the label's) own cut; 0.90 is the one new number.
+RV_RANK_BANDS = [
+    (0.00, 0.00, 0.10),
+    (0.75, 0.25, 0.50),
+    (0.90, 0.50, 0.75),
+]
+
+
+def hedge_band_from_rv_rank(rank: float) -> tuple[float, float]:
+    """Suggested hedge-ratio range from rv10's trailing-252 percentile rank
+    (freeze v3). Monotone by construction."""
+    if not 0.0 <= rank <= 1.0:
+        raise ValueError(f"rank out of range: {rank}")
+    lo, hi = RV_RANK_BANDS[0][1], RV_RANK_BANDS[0][2]
+    for cut, b_lo, b_hi in RV_RANK_BANDS:
+        if rank >= cut:
+            lo, hi = b_lo, b_hi
+    return lo, hi

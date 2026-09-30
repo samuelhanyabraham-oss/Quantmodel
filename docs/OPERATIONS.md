@@ -3,6 +3,28 @@
 Everything below is mechanical. Nothing here tunes, selects, or changes a
 frozen configuration; if a step would, stop and read CLAUDE.md.
 
+## One command
+
+    python scripts/daily.py [--refresh <tag> --source "<how pulled>"]
+
+runs the whole cycle below and prints the latest bands. Each step refuses
+loudly (stale bar, duplicate entry, restated history) rather than
+producing a wrong number; a refusal is reported and the run continues.
+
+## Book compositions (re-weighting)
+
+When holdings change, write a positions file `data/book_positions_cN.json`
+(same schema as `data/book_positions.json`: `asof`, `shares`, and a
+`last_close` map with the official prior-session closes), put any new
+name's daily closes under `data/raw/book/batch*.json` or a refresh
+`book_bars_*.csv`, then:
+
+    python scripts/book_pipeline.py build --composition N \
+        --refresh-dir data/raw/<tag> --activate "why"
+
+The old composition's snapshots and hashes stay; forward-test entries
+record the composition they were predicted on and are scored against it.
+
 ## Daily / weekly cycle
 
 1. **Pull new bars** (any reachable source; Robinhood MCP was used on
@@ -20,10 +42,9 @@ frozen configuration; if a step would, stop and read CLAUDE.md.
    pull could not deliver stays NaN and is listed under
    `missing_series_from` in `data/HOLDOUT_MANIFEST.json`.
 3. **Predict:**
-   - `python scripts/predict_today.py` (SPY, freeze v2). Refuses on a bar
-     where a frozen feature is not computable — currently every bar after
-     2026-08-12, because VIX3M has not been delivered. Refuses to log the
-     same (asof, config) twice.
+   - `python scripts/predict_today.py` (SPY, freeze v3: persistence rule
+     operational, freeze-v2 model as diagnostic when VIX3M exists).
+     Refuses to log the same (asof, config) twice.
    - `python scripts/book_pipeline.py predict` (book, persistence rule
      operational, model diagnostic if computable). Same guards.
 4. **Score resolved predictions:** `python scripts/forward_test_score.py`

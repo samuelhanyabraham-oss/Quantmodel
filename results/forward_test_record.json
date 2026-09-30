@@ -1,14 +1,19 @@
 {
-  "scored_utc": "2026-09-30T13:15:32.256734+00:00",
+  "scored_utc": "2026-09-30T18:41:14.656505+00:00",
   "panel_hash": "03e4e049ed307ffd2f29deee58d192ead672fe155b31ad2ec5a9db99c1289b95",
-  "book_hash": "116e0eeb2fc83224359b5e30910b202044180f88eafa4a8195dec39e08ce8668",
+  "book_hashes": {
+    "c1": "116e0eeb2fc83224359b5e30910b202044180f88eafa4a8195dec39e08ce8668"
+  },
   "latest_bar": {
     "SPY": "2026-09-29",
-    "book": "2026-09-29"
+    "book_c1": "2026-09-29"
   },
   "duplicate_entries_ignored": 2,
+  "skipped_entries": [],
   "aggregate": {
-    "SPY": {
+    "SPY | freeze-v2 logistic_small4 adaptive q70 w126": {
+      "universe": "SPY",
+      "config": "freeze-v2 logistic_small4 adaptive q70 w126",
       "n_logged": 1,
       "n_resolved": 1,
       "n_pending": 0,
@@ -26,22 +31,58 @@
       "effective_n_approx": 0.1,
       "skill_test": "not attempted: n_resolved < MIN_ROWS_FOR_TEST"
     },
-    "book": {
-      "n_logged": 2,
-      "n_resolved": 2,
+    "SPY | freeze-v3 persistence-operational, logistic_small4 diagnostic": {
+      "universe": "SPY",
+      "config": "freeze-v3 persistence-operational, logistic_small4 diagnostic",
+      "n_logged": 1,
+      "n_resolved": 0,
+      "n_pending": 1
+    },
+    "book | book-c1 freeze-v3 persistence-operational, logistic diagnostic": {
+      "universe": "book",
+      "config": "book-c1 freeze-v3 persistence-operational, logistic diagnostic",
+      "n_logged": 1,
+      "n_resolved": 0,
+      "n_pending": 1
+    },
+    "book | book-v1 logistic adaptive q70 w126": {
+      "universe": "book",
+      "config": "book-v1 logistic adaptive q70 w126",
+      "n_logged": 1,
+      "n_resolved": 1,
       "n_pending": 0,
       "confusion": {
         "TP": 0,
-        "FP": 1,
+        "FP": 0,
         "FN": 0,
         "TN": 1
       },
       "false_negatives_unhedged_into_regime": 0,
-      "false_positives_bleed_in_calm": 1,
-      "persistence_agreement": 0.5,
-      "nps_net_ann_signal": 0.45486,
+      "false_positives_bleed_in_calm": 0,
+      "persistence_agreement": 0.0,
+      "nps_net_ann_signal": 0.0,
       "nps_net_ann_persistence": 1.16172,
-      "effective_n_approx": 0.2,
+      "effective_n_approx": 0.1,
+      "skill_test": "not attempted: n_resolved < MIN_ROWS_FOR_TEST"
+    },
+    "book | book-v1 persistence-operational, logistic diagnostic": {
+      "universe": "book",
+      "config": "book-v1 persistence-operational, logistic diagnostic",
+      "n_logged": 2,
+      "n_resolved": 1,
+      "n_pending": 1,
+      "confusion": {
+        "TP": 0,
+        "FP": 1,
+        "FN": 0,
+        "TN": 0
+      },
+      "false_negatives_unhedged_into_regime": 0,
+      "false_positives_bleed_in_calm": 1,
+      "persistence_agreement": 1.0,
+      "nps_net_ann_signal": 1.16172,
+      "nps_net_ann_persistence": 1.16172,
+      "effective_n_approx": 0.1,
       "skill_test": "not attempted: n_resolved < MIN_ROWS_FOR_TEST"
     }
   },
@@ -49,6 +90,7 @@
     {
       "asof": "2026-08-12",
       "universe": "SPY",
+      "book_composition": null,
       "config": "freeze-v2 logistic_small4 adaptive q70 w126",
       "signal": 0,
       "band": [
@@ -67,6 +109,7 @@
     {
       "asof": "2026-08-12",
       "universe": "book",
+      "book_composition": 1,
       "config": "book-v1 logistic adaptive q70 w126",
       "signal": 0,
       "band": [
@@ -85,6 +128,7 @@
     {
       "asof": "2026-08-12",
       "universe": "book",
+      "book_composition": 1,
       "config": "book-v1 persistence-operational, logistic diagnostic",
       "signal": 1,
       "band": [
@@ -99,6 +143,42 @@
       "fwd_ret_10": -0.0962,
       "persistence_signal": 1,
       "outcome": "FP"
+    },
+    {
+      "asof": "2026-09-29",
+      "universe": "book",
+      "book_composition": 1,
+      "config": "book-v1 persistence-operational, logistic diagnostic",
+      "signal": 0,
+      "band": [
+        0.0,
+        0.1
+      ],
+      "resolved": false
+    },
+    {
+      "asof": "2026-09-29",
+      "universe": "SPY",
+      "book_composition": null,
+      "config": "freeze-v3 persistence-operational, logistic_small4 diagnostic",
+      "signal": 0,
+      "band": [
+        0.0,
+        0.1
+      ],
+      "resolved": false
+    },
+    {
+      "asof": "2026-09-29",
+      "universe": "book",
+      "book_composition": 1,
+      "config": "book-c1 freeze-v3 persistence-operational, logistic diagnostic",
+      "signal": 0,
+      "band": [
+        0.0,
+        0.1
+      ],
+      "resolved": false
     }
   ],
   "claim": "none \u2014 forward record too short for any test (see aggregate.skill_test)"

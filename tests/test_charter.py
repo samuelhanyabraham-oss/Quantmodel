@@ -66,10 +66,12 @@ def test_frozen_files_are_not_modified():
     assert data.sha256_file(data.SNAP_DIR / "panel_dev.csv") == m["dev_sha256"]
     assert data.sha256_file(data.SNAP_DIR / "panel_full.csv") == m["full_sha256"]
     assert data.sha256_file(data.SNAP_DIR / "panel_holdout.csv") == m["holdout_sha256"]
-    bm = book.load_book_manifest()
-    assert book._sha256(book.BOOK_SNAP) == bm["book_sha256"]
-    for v in bm.get("versions", []):
-        assert book._sha256(book.BOOK_SNAP.parent / v["path"]) == v["sha256"], v["path"]
+    for mp in sorted(book.DATA_DIR.glob("BOOK*_MANIFEST.json")):
+        bm = json.loads(mp.read_text())
+        prefix = "book" if bm.get("composition", 1) == 1 else f"book_c{bm['composition']}"
+        assert book._sha256(book._snap_dir() / bm.get("path", f"{prefix}_v1.csv")) == bm["book_sha256"], mp.name
+        for v in bm.get("versions", []):
+            assert book._sha256(book._snap_dir() / v["path"]) == v["sha256"], v["path"]
 
 
 def test_timing_test_is_calibrated_on_noise_and_detects_real_timing():

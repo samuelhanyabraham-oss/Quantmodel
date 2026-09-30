@@ -43,3 +43,17 @@ def test_band_edges_match_freeze_doc():
 def test_out_of_range_rejected():
     with pytest.raises(ValueError):
         hedge_band(1.5)
+
+
+def test_rv_rank_bands_monotone_and_rule_consistent():
+    from regime.bands import RV_RANK_BANDS, hedge_band_from_rv_rank
+    from regime.labels import PCTL
+    assert RV_RANK_BANDS[1][0] == PCTL  # the middle cut IS the persistence rule's cut
+    prev = (0.0, 0.0)
+    for r in [i / 100 for i in range(101)]:
+        lo, hi = hedge_band_from_rv_rank(r)
+        assert lo >= prev[0] and hi >= prev[1] and lo <= hi
+        prev = (lo, hi)
+    assert hedge_band_from_rv_rank(0.74) == (0.0, 0.10)
+    assert hedge_band_from_rv_rank(0.75) == (0.25, 0.50)
+    assert hedge_band_from_rv_rank(0.90) == (0.50, 0.75)

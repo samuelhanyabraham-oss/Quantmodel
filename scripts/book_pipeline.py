@@ -29,8 +29,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from sklearn.preprocessing import StandardScaler
 
 from regime import baselines, book, data, evaluate, experiment_log, labels, models
-from regime.bands import hedge_band_from_rank
-from regime.labels import realized_vol_trailing
+from regime.bands import hedge_band_from_rv_rank
+from regime.labels import PCTL, TRAIL_WINDOW, realized_vol_trailing
 from regime.validation import purged_walk_forward
 
 SEED = 20260813
@@ -144,20 +144,26 @@ def cmd_predict() -> None:
     thresh = float(df.loc[latest, "rv_thresh"])
 
     # OPERATIONAL SIGNAL = the persistence rule on the book, not the model.
-    # Book walk-forward (results/book_walk_forward.json): the fitted model
-    # scored AUC 0.38 (anti-skill) while book-persistence scored 0.64 with
-    # NPS +18%/yr — on a book whose 10-day drawdowns dwarf hedge bleed, the
-    # simple rule is the only defensible signal. Model prob/rank stay in the
-    # record as diagnostics and for the forward test.
+    # Book walk-forward (results/book_walk_forward.json, corrected in the
+    # REPORT erratum): the fitted model scored AUC 0.38 (anti-skill) while
+    # book-persistence scored 0.61 with NPS +19%/yr — on a book whose 10-day
+    # drawdowns dwarf hedge bleed, the simple rule is the only defensible
+    # signal. Freeze v3 bands: the trailing-252 percentile rank of the
+    # book's rv10 (0.75 = the rule's own cut, 0.90 = the top band).
     in_regime = brv > thresh
-    band = hedge_band_from_rank(0.75 if in_regime else 0.0)
+    rv_window = df["brv10"].loc[:latest].dropna().iloc[-TRAIL_WINDOW:]
+    rv_rank = float(np.mean(rv_window.to_numpy() <= brv))
+    band = hedge_band_from_rv_rank(rv_rank)
 
+    comp = book.active_composition()
     entry = {
         "asof": str(latest.date()),
         "universe": "book",
+        "book_composition": comp,
         "signal_rule": "book_persistence (rv10 > trailing 1y q75)",
         "in_regime": bool(in_regime),
         "signal": int(in_regime),
+        "book_rv10_rank252": round(rv_rank, 4),
         "band_lo": band[0], "band_hi": band[1],
         "model_prob_diagnostic": p_today,
         "model_rank_diagnostic": rank,
@@ -165,7 +171,7 @@ def cmd_predict() -> None:
         "book_regime_thresh": round(thresh, 4),
         "book_beta63_vs_spy": round(beta, 2),
         "spy_hedge_notional_per_100k_book": round(1e5 * (band[0] + band[1]) / 2 * beta),
-        "config": "book-v1 persistence-operational, logistic diagnostic",
+        "config": f"book-c{comp} freeze-v3 persistence-operational, logistic diagnostic",
         "label_resolves_after": str((latest + pd.tseries.offsets.BDay(labels.HORIZON)).date()),
     }
     from predict_today import already_logged  # same idempotency rule
@@ -186,7 +192,18 @@ def cmd_predict() -> None:
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "predict"
     if cmd == "build":
-        print(json.dumps(book.build_book_snapshot(), indent=2))
+        # build [--composition N] [--refresh-dir data/raw/<tag> ...] [--activate "<reason>"]
+        import argparse
+        ap = argparse.ArgumentParser(prog="book_pipeline.py build")
+        ap.add_argument("--composition", type=int, default=1)
+        ap.add_argument("--refresh-dir", action="append", default=[])
+        ap.add_argument("--source", default="")
+        ap.add_argument("--activate", metavar="REASON", default=None)
+        a = ap.parse_args(sys.argv[2:])
+        print(json.dumps(book.build_book_snapshot(a.composition, refresh_dirs=[ROOT / d for d in a.refresh_dir],
+                                                  source=a.source), indent=2))
+        if a.activate is not None:
+            print(json.dumps(book.set_active_composition(a.composition, a.activate), indent=2))
     elif cmd == "evaluate":
         cmd_evaluate()
     elif cmd == "predict":

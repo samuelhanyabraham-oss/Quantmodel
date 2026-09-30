@@ -1,3 +1,51 @@
+# Freeze v3 — 2026-09-30, operational SPY signal = persistence rule
+
+Owner instruction: "keep going until you finish and it works." The system
+"works" when it emits a hedge band every trading day from a validated
+signal. After the long-history replication (docs/long_history_plan.md,
+M = 41) the evidence is unambiguous and this freeze follows it:
+
+- Every fitted model (L3, L4; 3 and 16 features; logistic and GBM) equals
+  the persistence rule on AUC (0.716 vs 0.716) and scores below it net.
+- The persistence rule's *timing* is real: +1.6%/yr over its circular-shift
+  null, p ≈ 0.004 (effective N ≈ 600).
+- The frozen v2 model cannot run at all without VIX3M, which no reachable
+  source has delivered since 2026-08-12.
+
+**Operational signal (SPY):** the charter's baseline #1, unchanged in
+definition — trailing 10-day realized vol of SPY above the 75th percentile
+of its own trailing 252-day history. Its continuous score is the trailing
+percentile RANK of today's rv10 within the trailing 252 rv10 values.
+
+**Bands (monotone, piecewise-constant, three):**
+
+| rv10 trailing-252 rank | hedge-ratio band |
+|---|---|
+| < 0.75 (rule off) | 0–10% |
+| 0.75 – 0.90 | 25–50% |
+| ≥ 0.90 | 50–75% |
+
+The 0.75 cut IS the rule (and the label's own percentile); the 0.90 cut is
+chosen now, before any forward result exists under v3, and is the only new
+number in this freeze. Output contract unchanged: bands, never orders.
+
+**Diagnostic (not operational):** the freeze-v2 logistic model
+[rv10, vix, vix_slope, rv_ratio_10_63] with its adaptive rank operating
+point is computed and logged alongside whenever VIX3M is available, so the
+forward record can still test it; it is null otherwise.
+
+**Alternative recorded, not adopted:** baseline #3 (trailing 60th pct)
+scores +2.4%/yr vs +2.1% for persistence with a lower false-negative rate
+(0.30 vs 0.44) but 14% more hedge-on days; at 4 bp/day bleed the order
+flips. Within noise. Persistence is chosen for label consistency and fewer
+switches; the owner may flip this in writing.
+
+**What would end v3:** the forward record (scripts/forward_test_score.py)
+showing the diagnostic model beating the rule under the frozen
+block-bootstrap + Bonferroni machinery — nothing else.
+
+---
+
 # Freeze v2 — 2026-08-13, post-dissolution (operational configuration)
 
 The holdout was dissolved by the owner after its one evaluation (charter

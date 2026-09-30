@@ -30,9 +30,15 @@ features, logistic + gbm, pre-registered): no skill, twice. Harness
 self-checks added: timing-value null test, autocorrelation-based effective
 N (n/10 overstates ~3×), cost break-evens, charter-enforcement tests. M = 39.
 
-**What is left that does not need the owner:** nothing. Every pre-registered
-question on the long panel is answered. Open owner decisions: VIX3M feed,
-book composition 2, cost-model bleed amendment, effective-N headline rule.
+**Status (2026-09-30, freeze v3):** the system operates. SPY and book legs
+both emit daily bands from the persistence rule (the only signal with
+tested timing value), model as diagnostic; `scripts/daily.py` runs the
+cycle; book compositions are versioned and rebuildable from a positions
+file. An adversarial code review found and fixed four bugs (one
+pre-existing; REPORT erratum). M = 45.
+
+**Open owner decisions:** VIX3M feed (network allow-list), a positions file
+for book composition 2, cost-model bleed amendment, effective-N headline rule.
 
 The ordering principle: **everything that could flatter a result is built and
 frozen before any model exists.** Harness → data → labels/baselines/validation →

@@ -53,13 +53,20 @@ def read_forward_log() -> tuple[list[dict], int]:
     return out, dupes
 
 
-def _universe_frames() -> dict[str, pd.DataFrame]:
-    frames = {}
-    spy = data.load_dev_panel()["SPY_close"]
-    frames[None] = _resolve_frame(spy)
-    if (ROOT / "data" / "BOOK_MANIFEST.json").exists():
-        frames["book"] = _resolve_frame(book.load_book_panel()["BOOK_close"])
+def _universe_frames() -> dict:
+    """Frames keyed by universe; book frames keyed ("book", composition) so an
+    entry is scored against the composition it was predicted on."""
+    frames = {None: _resolve_frame(data.load_dev_panel()["SPY_close"])}
+    for mp in sorted(book.DATA_DIR.glob("BOOK*_MANIFEST.json")):
+        c = json.loads(mp.read_text()).get("composition", 1)
+        frames[("book", c)] = _resolve_frame(book.load_book_panel(c)["BOOK_close"])
     return frames
+
+
+def _frame_for(entry: dict, frames: dict):
+    if entry.get("universe") == "book":
+        return frames.get(("book", int(entry.get("book_composition", 1))))
+    return frames.get(entry.get("universe"))
 
 
 def _resolve_frame(close: pd.Series) -> pd.DataFrame:
@@ -74,7 +81,7 @@ def score(entries: list[dict], frames: dict[str, pd.DataFrame]) -> tuple[list[di
     """Returns (scored rows, skipped entries with a reason)."""
     rows, skipped = [], []
     for e in entries:
-        f = frames.get(e.get("universe"))
+        f = _frame_for(e, frames)
         if f is None:
             skipped.append({"asof": e["asof"], "universe": e.get("universe"), "reason": "no frame for universe"})
             continue
@@ -86,6 +93,7 @@ def score(entries: list[dict], frames: dict[str, pd.DataFrame]) -> tuple[list[di
         resolved = not pd.isna(r["label"])
         row = {
             "asof": e["asof"], "universe": e.get("universe") or "SPY",
+            "book_composition": int(e.get("book_composition", 1)) if e.get("universe") == "book" else None,
             "config": e["config"], "signal": int(e["signal"]),
             "band": [e["band_lo"], e["band_hi"]],
             "resolved": bool(resolved),
@@ -150,8 +158,8 @@ def main() -> None:
     record = {
         "scored_utc": pd.Timestamp.now("UTC").isoformat(),
         "panel_hash": data.snapshot_hash(),
-        "book_hash": book.book_snapshot_hash() if "book" in frames else None,
-        "latest_bar": {("SPY" if k is None else k): str(v["latest_bar"].iloc[0].date()) for k, v in frames.items()},
+        "book_hashes": {f"c{c}": book.book_snapshot_hash(c) for (_, c) in [k for k in frames if isinstance(k, tuple)]},
+        "latest_bar": {("SPY" if k is None else f"book_c{k[1]}"): str(v["latest_bar"].iloc[0].date()) for k, v in frames.items()},
         "duplicate_entries_ignored": dupes,
         "skipped_entries": skipped,
         "aggregate": agg,

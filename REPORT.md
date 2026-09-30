@@ -353,6 +353,36 @@ Section 1 and Section 2 stand unchanged. Section 2's falsifier
 2015 / 2018 / 2020 stress regimes, the current numbers were sample luck"
 has now been triggered.
 
+## Freeze v3 (2026-09-30): the system as it now operates
+
+Owner instruction: "keep going until it works." `docs/freeze.md` v3. The
+operational SPY signal is the charter's persistence rule — the only SPY
+signal with tested timing value on 25 years (p ≈ 0.004) and the one every
+fitted model restated. Its continuous score, the trailing-252 percentile
+rank of rv10, maps to three monotone bands (rank < 0.75 → 0–10%;
+0.75–0.90 → 25–50%; ≥ 0.90 → 50–75%); the 0.90 cut is the only new
+number and was fixed before any forward result under v3. The freeze-v2
+model is computed as a diagnostic whenever VIX3M exists (currently never)
+so the forward record can still test it. The book leg uses the same rule
+and bands on the book's own rv10. `scripts/daily.py` runs refresh →
+predict → predict → score in one command; every step refuses a stale bar
+or a duplicate entry.
+
+Readings logged for 2026-09-29 (labels resolve after 2026-10-13):
+
+| leg | rv10 | threshold | rank | regime | band |
+|---|---|---|---|---|---|
+| SPY | 11.4% | 14.4% | 0.53 | off | 0–10% |
+| book (composition 1, stale weights) | 48.0% | 87.9% | 0.11 | off | 0–10% |
+
+What "works" does not mean: no skill is claimed for anything. The rule is
+a disciplined, tested heuristic whose net value under the frozen cost
+model is +2.1%/yr over 25 years and whose timing beats a same-size static
+hedge by +1.6%/yr; a constant hedge still scores higher in absolute NPS
+until bleed exceeds ~4.8 bp/day. The book composition is versioned
+(`book_pipeline.py build --composition N --positions ...`) and waits on a
+positions file from the owner.
+
 ## Erratum (2026-09-30): baseline warm-up bug, audited
 
 An adversarial review of the code found that `run_experiments.py` and
