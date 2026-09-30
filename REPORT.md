@@ -315,6 +315,16 @@ is one of ten and is now classified as sample luck.
    realized vol has risen: persistence misses 82% of onsets under the
    charter's lead-time definition, the model 70%. Nothing here leads.
 
+**Second pre-registered check (L4, M = 38): the full VIX3M/HYG-free
+feature set (16 features), logistic and small GBM, one run each — NO
+SKILL CLAIMED, twice.** AUC 0.721 / 0.716 vs persistence 0.716 (p_raw 0.40
+/ 0.48, p_adj 1.0); net NPS +0.8% / +0.6%/yr vs +2.1% (persistence). A new
+supplementary timing test (`stats.timing_value_test`, circular-shift
+null preserving on-fraction and run lengths) shows the one-line rules'
+timing is real (persistence +1.6%/yr over its null, p ≈ 0.004) and the
+models' is weaker (+0.8%, p 0.03–0.06): fitting loses timing information
+the rule already has. Details: `docs/long_history_plan.md`.
+
 Section 1 and Section 2 stand unchanged. Section 2's falsifier
 "if the walk-forward advantage does not replicate across 2008 / 2011 /
 2015 / 2018 / 2020 stress regimes, the current numbers were sample luck"

@@ -148,3 +148,41 @@ realized vol at effective N ≈ 600 — and does anything *lead*?
   (Bonferroni over M at run time, M = 39 after these two are logged) AND
   net NPS > both computable baselines. Timing p and lead time are
   descriptive. Whatever happens, no third feature set, no tuning.
+
+## L4 result (run once, 2026-09-30, `results/long_l4.json`, M = 38)
+
+6,118 rows 2002-05 → 2026-09, effective N ≈ 597. Timing test = supplementary
+circular-shift null under the frozen cost model (`stats.timing_value_test`).
+
+| strategy | AUC [90% CI] | net NPS | on | timing excess / p | lead (median) | onsets missed |
+|---|---|---|---|---|---|---|
+| persistence | 0.716 [0.683, 0.745] | +2.08% | 24% | +1.63% / **0.004** | 8 d | 102 / 125 |
+| trailing pctl | 0.714 [0.684, 0.741] | +2.45% | 38% | +1.64% / **0.005** | 7 d | 78 / 125 |
+| logistic, 16 features | 0.721 [0.680, 0.760] | +0.80% | 33% | +0.82% / 0.034 | 4 d | 86 / 125 |
+| gbm, 16 features | 0.716 [0.678, 0.752] | +0.58% | 35% | +0.74% / 0.062 | 6 d | 86 / 125 |
+
+Logistic ΔAUC vs persistence +0.0055 (p_raw 0.40); gbm −0.0002 (p_raw 0.48);
+p_adj = 1.0 for both; both net below both baselines. **NO SKILL CLAIMED,
+twice.** Thirteen extra boring features add nothing a one-line rule
+doesn't already carry; the fitted models are *worse* net because they
+hedge more often for the same ranking.
+
+Two things the new timing test settles:
+
+1. **The one-line rules have real timing value.** Circularly shifting
+   persistence's signal (same on-fraction, same run lengths) costs
+   1.6%/yr with p ≈ 0.004. So "always-hedged beats it" (true, +6.8%/yr)
+   does NOT mean the rule is noise: under this cost model a static hedge
+   is subsidized, and the rule's timing adds a real increment on top of
+   its size. The two facts coexist; the report now states both.
+2. **The models' timing value is weaker than the rules'** (+0.8%/yr, p
+   0.03–0.06), i.e. fitting destroyed timing information the rule had.
+   Consistent with the models being persistence plus noise.
+
+Lead time: unchanged — nothing here leads regime onsets; the models' median
+lead (4–6 d) is shorter than the rules' (7–8 d) because they fire later
+and less decisively.
+
+Closed questions after L2–L4 (all pre-registered, M = 38): on 25 years the
+charter's feature set, with linear or small-tree models, does not beat
+persistence; the project's negative result stands with tight intervals.

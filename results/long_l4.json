@@ -1,0 +1,489 @@
+{
+  "panel_hash": "76eeb00bbf24ef81e4ee3ad786fc0296eaeb4eb18476fa92fd9d2dc38c9e5051",
+  "spec": "docs/long_history_plan.md L4",
+  "rows": 6118,
+  "span": [
+    "2002-05-17",
+    "2026-09-15"
+  ],
+  "n_folds": 10,
+  "features": [
+    "rv10",
+    "rv21",
+    "rv63",
+    "rv10_chg5",
+    "rv_ratio_10_63",
+    "volofvol21",
+    "vix",
+    "vix_chg5",
+    "vrp",
+    "qqq_rv10",
+    "iwm_rv10",
+    "dd_from_peak63",
+    "ret21",
+    "ret5",
+    "skew63",
+    "range5"
+  ],
+  "always_hedged_nps": 0.06746,
+  "baselines": {
+    "persistence": {
+      "name": "persistence",
+      "n_rows": 5968,
+      "effective_n": 596.8,
+      "base_rate": 0.2497,
+      "auc": 0.7158,
+      "auc_ci90": [
+        0.683,
+        0.7448
+      ],
+      "brier": 0.2081,
+      "brier_ci90": [
+        0.1845,
+        0.2321
+      ],
+      "precision": 0.5866,
+      "recall": 0.5638,
+      "false_negative_rate": 0.4362,
+      "false_positive_days_frac": 0.0992,
+      "nps_net_ann": 0.02083,
+      "hedge_on_frac": 0.2399,
+      "timing_excess_nps": 0.01634,
+      "timing_p": 0.0035,
+      "lead_n_onsets": 125,
+      "lead_n_missed": 102,
+      "lead_median_lead_days": 8.0,
+      "lead_mean_lead_days": 6.608695652173913
+    },
+    "trailing_pctl": {
+      "name": "trailing_pctl",
+      "n_rows": 5968,
+      "effective_n": 596.8,
+      "base_rate": 0.2497,
+      "auc": 0.714,
+      "auc_ci90": [
+        0.6838,
+        0.7411
+      ],
+      "brier": 0.2776,
+      "brier_ci90": [
+        0.2513,
+        0.305
+      ],
+      "precision": 0.4628,
+      "recall": 0.6973,
+      "false_negative_rate": 0.3027,
+      "false_positive_days_frac": 0.2021,
+      "nps_net_ann": 0.02455,
+      "hedge_on_frac": 0.3762,
+      "timing_excess_nps": 0.01639,
+      "timing_p": 0.0045,
+      "lead_n_onsets": 125,
+      "lead_n_missed": 78,
+      "lead_median_lead_days": 7.0,
+      "lead_mean_lead_days": 6.212765957446808
+    }
+  },
+  "models": {
+    "logistic": {
+      "metrics": {
+        "name": "logistic_16f_adaptive_long",
+        "n_rows": 5968,
+        "effective_n": 596.8,
+        "base_rate": 0.2497,
+        "auc": 0.7213,
+        "auc_ci90": [
+          0.6802,
+          0.7596
+        ],
+        "brier": 0.1631,
+        "brier_ci90": [
+          0.1465,
+          0.1802
+        ],
+        "precision": 0.3975,
+        "recall": 0.5295,
+        "false_negative_rate": 0.4705,
+        "false_positive_days_frac": 0.2004,
+        "nps_net_ann": 0.00805,
+        "hedge_on_frac": 0.3326,
+        "timing_excess_nps": 0.00816,
+        "timing_p": 0.0335,
+        "lead_n_onsets": 125,
+        "lead_n_missed": 86,
+        "lead_median_lead_days": 4.0,
+        "lead_mean_lead_days": 4.82051282051282,
+        "auc_minus_persistence": 0.0055,
+        "p_raw_vs_persistence": 0.3985
+      },
+      "per_fold": [
+        {
+          "fold": 0,
+          "start": "2002-12-19",
+          "end": "2005-05-03",
+          "auc": 0.548,
+          "persistence_auc": 0.64,
+          "model_nps": -0.01526,
+          "persistence_nps": -0.00975
+        },
+        {
+          "fold": 1,
+          "start": "2005-05-04",
+          "end": "2007-09-14",
+          "auc": 0.464,
+          "persistence_auc": 0.749,
+          "model_nps": -0.02777,
+          "persistence_nps": -0.00121
+        },
+        {
+          "fold": 2,
+          "start": "2007-09-17",
+          "end": "2010-01-28",
+          "auc": 0.816,
+          "persistence_auc": 0.736,
+          "model_nps": 0.06493,
+          "persistence_nps": 0.08565
+        },
+        {
+          "fold": 3,
+          "start": "2010-01-29",
+          "end": "2012-06-11",
+          "auc": 0.845,
+          "persistence_auc": 0.81,
+          "model_nps": 0.02087,
+          "persistence_nps": 0.03769
+        },
+        {
+          "fold": 4,
+          "start": "2012-06-12",
+          "end": "2014-10-23",
+          "auc": 0.714,
+          "persistence_auc": 0.554,
+          "model_nps": -0.01651,
+          "persistence_nps": -0.00875
+        },
+        {
+          "fold": 5,
+          "start": "2014-10-24",
+          "end": "2017-03-08",
+          "auc": 0.782,
+          "persistence_auc": 0.702,
+          "model_nps": -0.00345,
+          "persistence_nps": 0.00493
+        },
+        {
+          "fold": 6,
+          "start": "2017-03-09",
+          "end": "2019-07-22",
+          "auc": 0.842,
+          "persistence_auc": 0.754,
+          "model_nps": 0.01751,
+          "persistence_nps": 0.02729
+        },
+        {
+          "fold": 7,
+          "start": "2019-07-23",
+          "end": "2021-12-01",
+          "auc": 0.748,
+          "persistence_auc": 0.711,
+          "model_nps": 0.02763,
+          "persistence_nps": 0.04167
+        },
+        {
+          "fold": 8,
+          "start": "2021-12-02",
+          "end": "2024-04-17",
+          "auc": 0.816,
+          "persistence_auc": 0.749,
+          "model_nps": 0.01619,
+          "persistence_nps": 0.03279
+        },
+        {
+          "fold": 9,
+          "start": "2024-04-18",
+          "end": "2026-09-15",
+          "auc": 0.712,
+          "persistence_auc": 0.615,
+          "model_nps": -0.00143,
+          "persistence_nps": -0.00125
+        }
+      ],
+      "stress_windows": {
+        "dotcom_2001_02": {
+          "model_nps": 0.0,
+          "persistence_nps": -0.01313,
+          "model_on": 0.0,
+          "model_missed": 3,
+          "onsets": 3
+        },
+        "gfc_2008_09": {
+          "model_nps": 0.13798,
+          "persistence_nps": 0.31584,
+          "model_on": 0.39,
+          "model_missed": 4,
+          "onsets": 5
+        },
+        "flash_crash_2010": {
+          "model_nps": 0.10245,
+          "persistence_nps": 0.15488,
+          "model_on": 0.574,
+          "model_missed": 2,
+          "onsets": 3
+        },
+        "eurozone_2011": {
+          "model_nps": 0.10126,
+          "persistence_nps": 0.17249,
+          "model_on": 0.658,
+          "model_missed": 0,
+          "onsets": 0
+        },
+        "china_2015": {
+          "model_nps": 0.15488,
+          "persistence_nps": 0.05015,
+          "model_on": 0.833,
+          "model_missed": 0,
+          "onsets": 1
+        },
+        "volmageddon_2018": {
+          "model_nps": 0.10194,
+          "persistence_nps": 0.08404,
+          "model_on": 0.903,
+          "model_missed": 0,
+          "onsets": 0
+        },
+        "q4_2018": {
+          "model_nps": 0.24541,
+          "persistence_nps": 0.20476,
+          "model_on": 0.937,
+          "model_missed": 0,
+          "onsets": 1
+        },
+        "covid_2020": {
+          "model_nps": 0.47909,
+          "persistence_nps": 0.48878,
+          "model_on": 0.673,
+          "model_missed": 0,
+          "onsets": 0
+        },
+        "bear_2022": {
+          "model_nps": 0.04946,
+          "persistence_nps": 0.10634,
+          "model_on": 0.474,
+          "model_missed": 5,
+          "onsets": 6
+        },
+        "tariff_2025": {
+          "model_nps": 0.14238,
+          "persistence_nps": 0.11554,
+          "model_on": 0.587,
+          "model_missed": 2,
+          "onsets": 2
+        }
+      },
+      "M": 38,
+      "p_bonferroni": 1.0,
+      "beats_both_baselines_net": false,
+      "verdict": "NO SKILL CLAIMED"
+    },
+    "gbm": {
+      "metrics": {
+        "name": "gbm_16f_adaptive_long",
+        "n_rows": 5968,
+        "effective_n": 596.8,
+        "base_rate": 0.2497,
+        "auc": 0.7156,
+        "auc_ci90": [
+          0.678,
+          0.7516
+        ],
+        "brier": 0.1699,
+        "brier_ci90": [
+          0.1528,
+          0.1865
+        ],
+        "precision": 0.4063,
+        "recall": 0.5644,
+        "false_negative_rate": 0.4356,
+        "false_positive_days_frac": 0.2059,
+        "nps_net_ann": 0.00584,
+        "hedge_on_frac": 0.3468,
+        "timing_excess_nps": 0.00739,
+        "timing_p": 0.062,
+        "lead_n_onsets": 125,
+        "lead_n_missed": 86,
+        "lead_median_lead_days": 6.0,
+        "lead_mean_lead_days": 5.923076923076923,
+        "auc_minus_persistence": -0.0002,
+        "p_raw_vs_persistence": 0.4775
+      },
+      "per_fold": [
+        {
+          "fold": 0,
+          "start": "2002-12-19",
+          "end": "2005-05-03",
+          "auc": 0.682,
+          "persistence_auc": 0.64,
+          "model_nps": -0.00754,
+          "persistence_nps": -0.00975
+        },
+        {
+          "fold": 1,
+          "start": "2005-05-04",
+          "end": "2007-09-14",
+          "auc": 0.697,
+          "persistence_auc": 0.749,
+          "model_nps": -0.01347,
+          "persistence_nps": -0.00121
+        },
+        {
+          "fold": 2,
+          "start": "2007-09-17",
+          "end": "2010-01-28",
+          "auc": 0.791,
+          "persistence_auc": 0.736,
+          "model_nps": 0.06617,
+          "persistence_nps": 0.08565
+        },
+        {
+          "fold": 3,
+          "start": "2010-01-29",
+          "end": "2012-06-11",
+          "auc": 0.807,
+          "persistence_auc": 0.81,
+          "model_nps": 0.0022,
+          "persistence_nps": 0.03769
+        },
+        {
+          "fold": 4,
+          "start": "2012-06-12",
+          "end": "2014-10-23",
+          "auc": 0.691,
+          "persistence_auc": 0.554,
+          "model_nps": -0.0151,
+          "persistence_nps": -0.00875
+        },
+        {
+          "fold": 5,
+          "start": "2014-10-24",
+          "end": "2017-03-08",
+          "auc": 0.771,
+          "persistence_auc": 0.702,
+          "model_nps": -0.01099,
+          "persistence_nps": 0.00493
+        },
+        {
+          "fold": 6,
+          "start": "2017-03-09",
+          "end": "2019-07-22",
+          "auc": 0.744,
+          "persistence_auc": 0.754,
+          "model_nps": -0.0151,
+          "persistence_nps": 0.02729
+        },
+        {
+          "fold": 7,
+          "start": "2019-07-23",
+          "end": "2021-12-01",
+          "auc": 0.739,
+          "persistence_auc": 0.711,
+          "model_nps": 0.01766,
+          "persistence_nps": 0.04167
+        },
+        {
+          "fold": 8,
+          "start": "2021-12-02",
+          "end": "2024-04-17",
+          "auc": 0.842,
+          "persistence_auc": 0.749,
+          "model_nps": 0.02301,
+          "persistence_nps": 0.03279
+        },
+        {
+          "fold": 9,
+          "start": "2024-04-18",
+          "end": "2026-09-15",
+          "auc": 0.696,
+          "persistence_auc": 0.615,
+          "model_nps": 0.01187,
+          "persistence_nps": -0.00125
+        }
+      ],
+      "stress_windows": {
+        "dotcom_2001_02": {
+          "model_nps": 0.0,
+          "persistence_nps": -0.01313,
+          "model_on": 0.0,
+          "model_missed": 3,
+          "onsets": 3
+        },
+        "gfc_2008_09": {
+          "model_nps": 0.21439,
+          "persistence_nps": 0.31584,
+          "model_on": 0.404,
+          "model_missed": 5,
+          "onsets": 5
+        },
+        "flash_crash_2010": {
+          "model_nps": 0.10568,
+          "persistence_nps": 0.15488,
+          "model_on": 0.593,
+          "model_missed": 2,
+          "onsets": 3
+        },
+        "eurozone_2011": {
+          "model_nps": 0.00381,
+          "persistence_nps": 0.17249,
+          "model_on": 0.526,
+          "model_missed": 0,
+          "onsets": 0
+        },
+        "china_2015": {
+          "model_nps": 0.06074,
+          "persistence_nps": 0.05015,
+          "model_on": 0.714,
+          "model_missed": 0,
+          "onsets": 1
+        },
+        "volmageddon_2018": {
+          "model_nps": -0.02062,
+          "persistence_nps": 0.08404,
+          "model_on": 0.484,
+          "model_missed": 0,
+          "onsets": 0
+        },
+        "q4_2018": {
+          "model_nps": 0.15651,
+          "persistence_nps": 0.20476,
+          "model_on": 0.778,
+          "model_missed": 0,
+          "onsets": 1
+        },
+        "covid_2020": {
+          "model_nps": 0.53791,
+          "persistence_nps": 0.48878,
+          "model_on": 0.75,
+          "model_missed": 0,
+          "onsets": 0
+        },
+        "bear_2022": {
+          "model_nps": 0.05554,
+          "persistence_nps": 0.10634,
+          "model_on": 0.44,
+          "model_missed": 6,
+          "onsets": 6
+        },
+        "tariff_2025": {
+          "model_nps": 0.14078,
+          "persistence_nps": 0.11554,
+          "model_on": 0.619,
+          "model_missed": 2,
+          "onsets": 2
+        }
+      },
+      "M": 38,
+      "p_bonferroni": 1.0,
+      "beats_both_baselines_net": false,
+      "verdict": "NO SKILL CLAIMED"
+    }
+  }
+}
