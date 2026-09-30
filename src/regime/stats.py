@@ -59,3 +59,42 @@ def block_bootstrap_ci(
         return point, np.nan, np.nan
     lo, hi = np.quantile(vals, [alpha / 2, 1 - alpha / 2])
     return point, float(lo), float(hi)
+
+
+def timing_value_test(
+    signal: np.ndarray,
+    fwd_ret: np.ndarray,
+    score_fn,
+    *,
+    n_perm: int = 2000,
+    min_shift: int = 2 * HORIZON,
+    seed: int = 0,
+) -> dict:
+    """Does a binary signal's TIMING add value beyond its hedge-on fraction?
+
+    Added 2026-09-30 after the long-history study showed the frozen NPS is
+    dominated by a constant (always-hedged beats every rule). NPS itself is
+    unchanged — this is a supplementary test. Null: the same signal
+    circularly shifted by a random offset >= min_shift, which preserves its
+    on-fraction AND its run-length structure exactly, so the only thing
+    destroyed is alignment with the returns. Reports the observed score,
+    the null mean, the excess, and a one-sided p (P[null >= observed]).
+    A low p means the signal's timing, not its size, earns its score.
+    """
+    s = np.asarray(signal, dtype=float)
+    r = np.asarray(fwd_ret, dtype=float)
+    n = len(s)
+    rng = np.random.default_rng(seed)
+    observed = float(score_fn(s, r))
+    null = np.empty(n_perm)
+    for i in range(n_perm):
+        k = int(rng.integers(min_shift, n - min_shift))
+        null[i] = score_fn(np.roll(s, k), r)
+    return {
+        "observed": round(observed, 5),
+        "null_mean": round(float(null.mean()), 5),
+        "null_sd": round(float(null.std()), 5),
+        "excess_over_null": round(observed - float(null.mean()), 5),
+        "p_one_sided": round(float(np.mean(null >= observed)), 4),
+        "n_perm": n_perm,
+    }
