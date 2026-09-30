@@ -21,6 +21,12 @@ predictions, nothing claimable. SPY forward test paused on a missing
 VIX3M feed; book signal continues (currently out of regime). See REPORT.md
 "Forward test — first refresh".
 
+**Status (2026-09-30, later):** long-history replication done under the
+owner's "your goal is to research" instruction: 2000→2026 panel frozen
+(docs/long_history_plan.md), baselines re-established on effective N ≈ 630,
+and the single pre-registered model check ran once — no skill (AUC equals
+persistence). The 5-year result is classified as sample luck. M = 36.
+
 The ordering principle: **everything that could flatter a result is built and
 frozen before any model exists.** Harness → data → labels/baselines/validation →
 features → models → report. The holdout is last and gated separately.

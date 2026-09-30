@@ -278,6 +278,48 @@ query1/query2.finance.yahoo.com, stooq.com, fred.stlouisfed.org,
 api.nasdaq.com). Allow-listing `cdn.cboe.com` is the smallest change that
 would lift the SPY forward-test pause.
 
+## Long-history replication (2026-09-30): the 5-year result did not replicate
+
+The binding limitation named in Section 1 — five years, one bear market,
+≈ 46 effective observations — was lifted: Robinhood's bar API serves daily
+history to 2000 (IBKR's cap was the limit). Data, repairs and the
+pre-registered plan are in `docs/long_history_plan.md`; the plan was
+committed (77f207e) before the model check ran. Both new runs are logged.
+
+**Baselines on 2001–2026 (effective N ≈ 630):** persistence AUC 0.714
+[0.684, 0.744]; trailing percentile 0.710. Both net-positive over 25 years
+(+2.3%, +2.8%/yr) though slightly net-negative outside the ten stress
+windows. This is the bar; it was 0.60 on the short sample only because
+that sample was mostly calm.
+
+**The one pre-registered model check (freeze-v2 procedure minus
+`vix_slope`, which no long history supplies): NO SKILL CLAIMED.** AUC
+0.716 vs persistence 0.716 (Δ = +0.0006, p_raw 0.49, p_adj 1.0 at M = 36);
+net NPS +1.4%/yr vs +2.1% (persistence) and +2.4% (trailing percentile).
+The model is persistence restated. Its encouraging 2021–26 fold (AUC 0.84)
+is one of ten and is now classified as sample luck.
+
+**Two things the long history exposed that the short one hid:**
+
+1. *The frozen cost model is dominated by a constant.* Hedging every day
+   scores +6.8%/yr under `docs/cost_model.md` and beats every rule and
+   model in every fold and every stress window: NPS credits half of every
+   negative 10-day return while charging 2 bp/day, a net subsidy to being
+   hedged on any long SPY sample. NPS therefore rewards hedge-on fraction
+   at least as much as timing. Changing the cost model is a charter
+   amendment and has not been made; a supplementary *timing value*
+   (NPS minus hedge-on × always-hedged NPS) is proposed in the plan doc.
+   Under it persistence adds +0.5%/yr over a static hedge of the same
+   size; the model −0.7%/yr; trailing percentile −0.1%/yr.
+2. *Lead time is structurally absent.* Every rule and the model fire after
+   realized vol has risen: persistence misses 82% of onsets under the
+   charter's lead-time definition, the model 70%. Nothing here leads.
+
+Section 1 and Section 2 stand unchanged. Section 2's falsifier
+"if the walk-forward advantage does not replicate across 2008 / 2011 /
+2015 / 2018 / 2020 stress regimes, the current numbers were sample luck"
+has now been triggered.
+
 ## Next steps (require human decisions)
 
 1. **VIX3M feed** (blocks the SPY forward test): authorize IBKR in a
@@ -291,9 +333,10 @@ would lift the SPY forward-test pause.
    the book.
 
 
-4. Secure a data source with 20+ years of daily history and re-run Phases
-   1–5 unchanged (the harness is source-agnostic); the 5-year cap is the
-   main reason this report can't say anything stronger.
+4. ~~Secure a data source with 20+ years of daily history~~ — done
+   2026-09-30 (`docs/long_history_plan.md`); the replication failed, see
+   the section above. Any further modeling on the long panel needs its
+   own pre-registration and counts toward M.
 5. Let the forward test run: refresh the snapshot periodically (new frozen
    version each time), run `predict_today.py` daily, and evaluate the
    forward record against persistence once it holds a few hundred rows

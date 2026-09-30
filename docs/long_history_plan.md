@@ -96,3 +96,31 @@ What this says, bluntly:
    both rules are slightly net-negative.
 
 L3 is run next, once, exactly as pre-registered above.
+
+## L3 result (run once, 2026-09-30, `results/long_model_check.json`, M = 36)
+
+6,123 rows 2002-05 → 2026-09, 10 folds, **effective N ≈ 597**.
+
+| strategy | AUC [90% CI] | Brier | NPS net | hedge-on | FN rate | timing value |
+|---|---|---|---|---|---|---|
+| logistic [rv10, vix, rv_ratio_10_63], adaptive rank | 0.716 [0.678, 0.751] | 0.171 | +1.39% | 31% | 0.49 | −0.68% |
+| persistence | 0.716 [0.684, 0.746] | 0.212 | +2.08% | 24% | 0.44 | +0.46% |
+| trailing pctl | 0.714 [0.684, 0.742] | 0.284 | +2.44% | 38% | 0.30 | −0.10% |
+| always hedged | — | — | +6.76% | 100% | — | 0 |
+
+AUC advantage over persistence: **+0.0006**, p_raw = 0.49, p_adj = 1.0.
+Net NPS below both baselines. **Verdict under the pre-registered rule: NO
+SKILL CLAIMED.** The model is the persistence rule restated — the exact
+failure mode the charter's baseline #1 was written to expose. Per fold the
+model's AUC swings from 0.49 (2003–05) to 0.84 (2022–24) while persistence
+stays 0.55–0.81; the 2021–26 window that looked encouraging in the
+original study is one of the model's best folds and does not generalize.
+In the ten stress windows the model was hedged less often than persistence
+in the two worst (GFC, 2022) and beat it only in the two 2018 episodes.
+
+Consequence for the project: with 12× the effective sample of the
+original study, the answer is unchanged and now statistically tight. The
+only thing the long history adds beyond "no skill" is the (better)
+calibration the Brier score shows, which has no cash value under the
+frozen cost model. The 2021–26 in-sample result (`REPORT.md`) is now
+classified as sample luck.
