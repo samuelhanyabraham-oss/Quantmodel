@@ -1,10 +1,22 @@
-# REPORT — Volatility/Drawdown Regime Model (final: holdout evaluated)
+# REPORT — Volatility/Drawdown Regime Model (final: holdout evaluated; long-history replication failed)
 
 Status: Phases 0–6 complete. The holdout was unlocked by the owner on
 2026-08-13 (data/HOLDOUT_UNLOCK.json) and evaluated exactly once, per the
 pre-registered plan in docs/freeze.md. Sections 1–3 below are the
 walk-forward analysis (written before the holdout was read and left
 unedited); the holdout section follows them.
+
+**Reader's summary as of 2026-09-30** (details in the dated sections at
+the end and in `docs/long_history_plan.md`): the project has now been run
+on 25 years of data (effective N ≈ 200–600 depending on the rule used).
+Three pre-registered model checks equal the persistence baseline on AUC
+(0.716 vs 0.716) and score below it net. No skill is claimed, and the
+2021–26 in-sample result is classified as sample luck. Under the frozen
+cost model a constant hedge beats every signal, breaking even only at
+5 bp/day of bleed; the one-line rules' *timing* is nonetheless real
+(p ≈ 0.004 against a shift null). Nothing leads a regime onset. The
+forward test continues for the book; the SPY leg is paused on a missing
+VIX3M feed. M = 39 logged runs.
 
 ## 1. Why this might be wrong
 

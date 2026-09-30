@@ -25,7 +25,14 @@ VIX3M feed; book signal continues (currently out of regime). See REPORT.md
 owner's "your goal is to research" instruction: 2000→2026 panel frozen
 (docs/long_history_plan.md), baselines re-established on effective N ≈ 630,
 and the single pre-registered model check ran once — no skill (AUC equals
-persistence). The 5-year result is classified as sample luck. M = 36.
+persistence). The 5-year result is classified as sample luck. Then L4 (16
+features, logistic + gbm, pre-registered): no skill, twice. Harness
+self-checks added: timing-value null test, autocorrelation-based effective
+N (n/10 overstates ~3×), cost break-evens, charter-enforcement tests. M = 39.
+
+**What is left that does not need the owner:** nothing. Every pre-registered
+question on the long panel is answered. Open owner decisions: VIX3M feed,
+book composition 2, cost-model bleed amendment, effective-N headline rule.
 
 The ordering principle: **everything that could flatter a result is built and
 frozen before any model exists.** Harness → data → labels/baselines/validation →
