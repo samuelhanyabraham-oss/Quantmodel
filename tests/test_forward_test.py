@@ -49,13 +49,16 @@ def test_score_resolves_only_closed_windows():
         {"asof": asof_resolved, "config": "c", "signal": 1, "band_lo": 0.25, "band_hi": 0.5},
         {"asof": asof_pending, "config": "c", "signal": 0, "band_lo": 0.0, "band_hi": 0.1},
     ]
-    rows = fts.score(entries, {None: frame})
+    rows, skipped = fts.score(entries, {None: frame})
+    assert skipped == []
     assert [r["resolved"] for r in rows] == [True, False]
     assert rows[0]["label"] in (0, 1)
     assert rows[0]["outcome"].startswith(("TP", "FP"))
     agg = fts.aggregate(rows, {None: frame})
-    assert agg["SPY"]["n_resolved"] == 1 and agg["SPY"]["n_pending"] == 1
-    assert agg["SPY"]["skill_test"].startswith("not attempted")
+    (key,) = agg.keys()
+    assert key == "SPY | c"
+    assert agg[key]["n_resolved"] == 1 and agg[key]["n_pending"] == 1
+    assert agg[key]["skill_test"].startswith("not attempted")
 
 
 def test_score_label_matches_label_module():

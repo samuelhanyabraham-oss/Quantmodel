@@ -199,7 +199,8 @@ The book is NOT the SPY tape:
 
 Book walk-forward (M=27 after these runs): the fitted model is anti-skill
 (AUC 0.377 [0.28, 0.47]); **book-persistence** (trailing 10d RV above its
-own 1y 75th pct) scores AUC 0.639 [0.56, 0.71] and — unlike every SPY
+own 1y 75th pct) scores AUC 0.639 [0.56, 0.71] *(corrected 2026-09-30 to
+0.612 [0.53, 0.69], see Erratum)* and — unlike every SPY
 strategy — is decisively net-positive: **NPS +18.2%/yr**, because this
 book's 10-day drawdowns dwarf hedge bleed. The operational signal in
 `scripts/book_pipeline.py predict` is therefore the persistence rule; the
@@ -351,6 +352,39 @@ Section 1 and Section 2 stand unchanged. Section 2's falsifier
 "if the walk-forward advantage does not replicate across 2008 / 2011 /
 2015 / 2018 / 2020 stress regimes, the current numbers were sample luck"
 has now been triggered.
+
+## Erratum (2026-09-30): baseline warm-up bug, audited
+
+An adversarial review of the code found that `run_experiments.py` and
+`book_pipeline.py evaluate` computed the persistence and trailing-percentile
+baselines on the *already-truncated* close series, so the 252-day
+threshold was undefined for the first 261 evaluation rows and the signal
+silently read 0 there. `baselines.py` now returns NaN where its threshold
+is undefined, both scripts compute baselines on the full close, and a test
+guards it. The holdout script and every long-history run were unaffected
+(they already used the full close). Re-scoring the original frozen data
+both ways (`results/baseline_bug_audit.json`, logged, M = 41):
+
+| table | strategy | as reported | corrected | rows forced off |
+|---|---|---|---|---|
+| walk-forward, pre-holdout dev | persistence / trailing pctl | 0.596 / 0.654 | **unchanged** | 0 |
+| walk-forward, full sample v2 | persistence / trailing pctl | 0.642 / 0.650 | **unchanged** | 0 |
+| book walk-forward | book persistence | AUC 0.639, NPS +18.2% | **AUC 0.612 [0.529, 0.686], NPS +19.0%** | 31 |
+
+On SPY the rows the bug forced off fell in calm 2023 where the rule was off
+anyway, so no SPY number changes. On the book the bug *overstated* the
+persistence AUC by 0.027 (the forced-off rows happened to be label-0
+days); the operational conclusion (persistence net-positive on the book,
+fitted model anti-skill) survives, the number does not. The original
+results files are left as written; this section is the correction.
+
+Other review findings fixed in the same pass: the book refresh could not
+detect a retated/re-adjusted history (now compares every overlapping
+close per symbol); the market-panel refresh could pass with zero
+comparable SPY rows (now requires per-series overlap and a contiguous
+calendar); the forward-test scorer pooled different configs of one
+universe (now grouped per config); the timing test's p-value is now
+finite-sample corrected and guarded for short samples.
 
 ## Next steps (require human decisions)
 

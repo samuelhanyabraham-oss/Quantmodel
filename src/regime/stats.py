@@ -85,6 +85,10 @@ def timing_value_test(
     s = np.asarray(signal, dtype=float)
     r = np.asarray(fwd_ret, dtype=float)
     n = len(s)
+    if n <= 2 * min_shift + 1:
+        return {"observed": round(float(score_fn(s, r)), 5), "null_mean": None, "null_sd": None,
+                "excess_over_null": None, "p_one_sided": None, "n_perm": 0,
+                "note": f"too few rows ({n}) for a shift null with min_shift={min_shift}"}
     rng = np.random.default_rng(seed)
     observed = float(score_fn(s, r))
     null = np.empty(n_perm)
@@ -96,7 +100,8 @@ def timing_value_test(
         "null_mean": round(float(null.mean()), 5),
         "null_sd": round(float(null.std()), 5),
         "excess_over_null": round(observed - float(null.mean()), 5),
-        "p_one_sided": round(float(np.mean(null >= observed)), 4),
+        # finite-sample p: (1 + #null >= obs) / (1 + n_perm), never exactly 0
+        "p_one_sided": round(float((1 + np.sum(null >= observed)) / (1 + n_perm)), 4),
         "n_perm": n_perm,
     }
 

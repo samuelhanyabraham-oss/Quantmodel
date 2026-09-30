@@ -21,6 +21,12 @@ Construction (all recorded in data/LONG_MANIFEST.json):
   reversed by an opposite move > 0.25 (IWM 2005-02-17 and 2005-02-24, both
   half-price prints) is set to NaN and forward-filled (limit 3), the same
   gap policy as the original build. Listed in the manifest.
+- Note on look-ahead: both repairs use a CENTERED window (the 21-day median
+  ratio and the next-day reversal), i.e. bars after t decide whether bar t
+  is repaired. This is data cleaning of vendor errors, all dated before
+  2021, and touches 34 closes; it is not a feature and cannot inform a
+  prediction, but it is stated here because the charter forbids silent
+  use of future bars anywhere.
 No other value is touched. The result is hash-locked like every input.
 """
 

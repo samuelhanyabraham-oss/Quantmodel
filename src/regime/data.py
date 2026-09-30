@@ -30,6 +30,7 @@ MANIFEST_PATH = ROOT / "data" / "HOLDOUT_MANIFEST.json"
 SERIES = ["SPY", "QQQ", "IWM", "HYG", "LQD", "VIX", "VIX3M"]
 HOLDOUT_MONTHS = 18
 HL_REL_TOL = 0.001  # vendor tolerance on overlap highs/lows (closes: exact)
+MAX_CAL_GAP_DAYS = 5  # refresh contiguity: longest legal calendar gap between SPY bars
 
 
 def sha256_file(path: Path) -> str:
@@ -224,23 +225,41 @@ def refresh_snapshot(refresh_tag: str, *, source: str, note: str = "") -> dict:
     # (auction / odd-lot extreme prints); tolerated up to HL_REL_TOL of the
     # close and recorded in the manifest, never silently.
     hl_worst = 0.0
+    add_all = new[new.index > current.index.max()]
+    per_series_overlap = {}
     for col in current.columns:
         a = new.loc[overlap, col]
         b = current.loc[overlap, col]
+        # a value the frozen panel never had (b NaN) cannot disagree; it also
+        # cannot be back-filled through this path (only rows after the
+        # frozen end are appended) — recorded, not silently dropped.
+        comparable = a.notna() & b.notna()
         if col.endswith("_close"):
-            ok = a.isna() | ((a - b).abs() <= 1e-6)
+            series = col[:-6]
+            per_series_overlap[series] = int(comparable.sum())
+            delivered_after_end = add_all[col].notna().any()
+            if delivered_after_end and comparable.sum() == 0:
+                raise RuntimeError(
+                    f"{series} has new bars but no comparable overlap row with the frozen panel — "
+                    "cannot verify continuity; pull at least 3 overlapping days")
+            ok = ~comparable | ((a - b).abs() <= 1e-6)
         else:
-            rel = ((a - b).abs() / b).fillna(0.0)
+            rel = ((a - b).abs() / b).where(comparable, 0.0)
             hl_worst = max(hl_worst, float(rel.max()))
-            ok = a.isna() | (rel <= HL_REL_TOL)
+            ok = ~comparable | (rel <= HL_REL_TOL)
         if not ok.all():
             bad = overlap[~ok.to_numpy()]
             raise RuntimeError(f"refresh disagrees with frozen values for {col} on {list(bad.date)}")
-
-    add = new[new.index > current.index.max()]
-    add = add[add["SPY_close"].notna()]
+    add = add_all[add_all["SPY_close"].notna()]
     if add.empty:
         raise RuntimeError("refresh contains no rows after the active panel end")
+    # Contiguity: no calendar gap over a long weekend + holiday (<= 5 days)
+    # between the frozen end and the last new SPY bar. A dropped bar would
+    # silently shorten every rolling and forward window across it.
+    dates = pd.DatetimeIndex([current.index.max(), *add.index])
+    gaps = pd.Series(dates[1:] - dates[:-1]).dt.days
+    if (gaps > MAX_CAL_GAP_DAYS).any():
+        raise RuntimeError(f"calendar gap of {int(gaps.max())} days inside the refresh — a bar is missing")
     panel = pd.concat([current, add[current.columns]])
 
     version = len(m.get("versions", [])) + 3  # v1 = dev, v2 = full (dissolved)
@@ -249,7 +268,9 @@ def refresh_snapshot(refresh_tag: str, *, source: str, note: str = "") -> dict:
         raise RuntimeError(f"{path.name} already exists — versions are immutable")
     panel.to_csv(path, float_format="%.6f")
     missing = {
-        s: str(add.index[add[f"{s}_close"].isna()].min().date())
+        s: {"first": str(add.index[add[f"{s}_close"].isna()].min().date()),
+            "last": str(add.index[add[f"{s}_close"].isna()].max().date()),
+            "n_missing": int(add[f"{s}_close"].isna().sum()), "n_added": len(add)}
         for s in SERIES if add[f"{s}_close"].isna().any()
     }
     entry = {
@@ -265,6 +286,7 @@ def refresh_snapshot(refresh_tag: str, *, source: str, note: str = "") -> dict:
         "source": source,
         "missing_series_from": missing,
         "overlap_rows_checked": len(overlap),
+        "overlap_close_rows_compared_per_series": per_series_overlap,
         "overlap_high_low_max_rel_diff": round(hl_worst, 6),
         "note": note,
     }

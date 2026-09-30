@@ -65,6 +65,7 @@ def build_dataset() -> pd.DataFrame:
     lab = labels.build_labels(close)
     out = df.join(lab).join(f)
     out["fwd_ret_10"] = close.shift(-labels.HORIZON) / close - 1.0
+    out["persistence"] = baselines.persistence(close)  # on the FULL close (erratum 2026-09-30)
     return out
 
 
@@ -75,7 +76,7 @@ def cmd_evaluate() -> None:
     test_df = df.iloc[test_rows]
     snap = book.book_snapshot_hash()
 
-    persist = baselines.persistence(df["BOOK_close"]).iloc[test_rows]
+    persist = df["persistence"].iloc[test_rows]
     res_p = evaluate.evaluate_strategy(persist, persist, test_df, name="book_persistence", seed=SEED)
     experiment_log.log_run(
         {"strategy": "book_persistence", "type": "baseline", "universe": "book"},

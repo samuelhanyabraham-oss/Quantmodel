@@ -65,6 +65,11 @@ def test_frozen_files_are_not_modified():
         assert data.sha256_file(data.SNAP_DIR / v["path"]) == v["sha256"], v["path"]
     assert data.sha256_file(data.SNAP_DIR / "panel_dev.csv") == m["dev_sha256"]
     assert data.sha256_file(data.SNAP_DIR / "panel_full.csv") == m["full_sha256"]
+    assert data.sha256_file(data.SNAP_DIR / "panel_holdout.csv") == m["holdout_sha256"]
+    bm = book.load_book_manifest()
+    assert book._sha256(book.BOOK_SNAP) == bm["book_sha256"]
+    for v in bm.get("versions", []):
+        assert book._sha256(book.BOOK_SNAP.parent / v["path"]) == v["sha256"], v["path"]
 
 
 def test_timing_test_is_calibrated_on_noise_and_detects_real_timing():
@@ -79,6 +84,18 @@ def test_timing_test_is_calibrated_on_noise_and_detects_real_timing():
     oracle = (r < 0).astype(float)
     res = timing_value_test(oracle, r, net_protection_score, n_perm=400, seed=1)
     assert res["p_one_sided"] < 0.01 and res["excess_over_null"] > 0
+
+
+def test_baselines_are_nan_not_zero_during_warmup():
+    """Erratum 2026-09-30: a baseline computed on a truncated close must not
+    silently read 0 where its threshold is undefined."""
+    import pandas as pd
+    from regime import baselines
+    rng = np.random.default_rng(7)
+    close = pd.Series(100 * np.exp(np.cumsum(rng.normal(0, 0.01, 400))))
+    s = baselines.persistence(close)
+    assert s.iloc[:261].isna().all() and s.iloc[261:].notna().all()
+    assert set(s.dropna().unique()) <= {0.0, 1.0}
 
 
 def test_effective_n_acf_matches_iid_and_shrinks_under_dependence():

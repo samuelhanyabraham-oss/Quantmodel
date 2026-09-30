@@ -70,14 +70,17 @@ def _resolve_frame(close: pd.Series) -> pd.DataFrame:
     return lab
 
 
-def score(entries: list[dict], frames: dict[str, pd.DataFrame]) -> list[dict]:
-    rows = []
+def score(entries: list[dict], frames: dict[str, pd.DataFrame]) -> tuple[list[dict], list[dict]]:
+    """Returns (scored rows, skipped entries with a reason)."""
+    rows, skipped = [], []
     for e in entries:
         f = frames.get(e.get("universe"))
         if f is None:
+            skipped.append({"asof": e["asof"], "universe": e.get("universe"), "reason": "no frame for universe"})
             continue
         t = pd.Timestamp(e["asof"])
         if t not in f.index:
+            skipped.append({"asof": e["asof"], "universe": e.get("universe"), "reason": "asof not in active snapshot"})
             continue
         r = f.loc[t]
         resolved = not pd.isna(r["label"])
@@ -100,15 +103,20 @@ def score(entries: list[dict], frames: dict[str, pd.DataFrame]) -> list[dict]:
                     (int(e["signal"]), y)],
             })
         rows.append(row)
-    return rows
+    return rows, skipped
 
 
 def aggregate(rows: list[dict], frames: dict[str, pd.DataFrame]) -> dict:
+    """One record per (universe, config): different configs are different
+    strategies and are never pooled (erratum 2026-09-30 — the first version
+    pooled by universe and mixed the retired book model entry with the
+    operational rule on the same day)."""
     agg = {}
-    for uni in sorted({r["universe"] for r in rows}):
-        rs = [r for r in rows if r["universe"] == uni and r["resolved"]]
-        pend = [r for r in rows if r["universe"] == uni and not r["resolved"]]
-        a = {"n_logged": len(rs) + len(pend), "n_resolved": len(rs), "n_pending": len(pend)}
+    for uni, cfg in sorted({(r["universe"], r["config"]) for r in rows}):
+        key = f"{uni} | {cfg}"
+        rs = [r for r in rows if r["universe"] == uni and r["config"] == cfg and r["resolved"]]
+        pend = [r for r in rows if r["universe"] == uni and r["config"] == cfg and not r["resolved"]]
+        a = {"universe": uni, "config": cfg, "n_logged": len(rs) + len(pend), "n_resolved": len(rs), "n_pending": len(pend)}
         if rs:
             s = np.array([r["signal"] for r in rs], float)
             y = np.array([r["label"] for r in rs], float)
@@ -130,14 +138,14 @@ def aggregate(rows: list[dict], frames: dict[str, pd.DataFrame]) -> dict:
                 a.update({"auc_minus_persistence": round(diff, 4), "p_raw": round(p_raw, 4),
                           "M": M, "p_bonferroni": round(min(1.0, p_raw * M), 4),
                           "decision_rule": "claim only if p_bonferroni < 0.10 (docs/multiple_testing.md)"})
-        agg[uni] = a
+        agg[key] = a
     return agg
 
 
 def main() -> None:
     entries, dupes = read_forward_log()
     frames = _universe_frames()
-    rows = score(entries, frames)
+    rows, skipped = score(entries, frames)
     agg = aggregate(rows, frames)
     record = {
         "scored_utc": pd.Timestamp.now("UTC").isoformat(),
@@ -145,6 +153,7 @@ def main() -> None:
         "book_hash": book.book_snapshot_hash() if "book" in frames else None,
         "latest_bar": {("SPY" if k is None else k): str(v["latest_bar"].iloc[0].date()) for k, v in frames.items()},
         "duplicate_entries_ignored": dupes,
+        "skipped_entries": skipped,
         "aggregate": agg,
         "rows": rows,
         "claim": "none — forward record too short for any test (see aggregate.skill_test)",
@@ -152,7 +161,7 @@ def main() -> None:
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(json.dumps(record, indent=2) + "\n")
     experiment_log.log_run(
-        {"strategy": "forward_test_scoring", "universes": sorted(agg)},
+        {"strategy": "forward_test_scoring", "groups": sorted(agg)},
         {u: {k: v for k, v in a.items() if k in ("n_resolved", "n_pending", "nps_net_ann_signal",
                                                    "nps_net_ann_persistence", "p_raw", "p_bonferroni")}
          for u, a in agg.items()},

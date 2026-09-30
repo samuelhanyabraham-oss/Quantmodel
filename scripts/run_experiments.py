@@ -29,6 +29,12 @@ def build_dataset() -> pd.DataFrame:
     feats = features.build_features(panel)
     df = panel.join(lab).join(feats)
     df["fwd_ret_10"] = panel["SPY_close"].shift(-labels.HORIZON) / panel["SPY_close"] - 1.0
+    # Baselines on the FULL close (erratum 2026-09-30: computing them on the
+    # dropna'd frame left the 252-day threshold undefined for the first
+    # rows of the evaluation and forced the signal off there).
+    df["persistence"] = baselines.persistence(panel["SPY_close"])
+    df["term_structure"] = baselines.term_structure(panel["VIX_close"], panel["VIX3M_close"])
+    df["trailing_pctl"] = baselines.trailing_pctl_rule(panel["SPY_close"])
     df = df.dropna()
     return df
 
@@ -43,11 +49,7 @@ def main() -> None:
     results = {}
 
     # --- baselines (binary; prob == signal) ---
-    base_signals = {
-        "persistence": baselines.persistence(df["SPY_close"]),
-        "term_structure": baselines.term_structure(df["VIX_close"], df["VIX3M_close"]),
-        "trailing_pctl": baselines.trailing_pctl_rule(df["SPY_close"]),
-    }
+    base_signals = {n: df[n] for n in ("persistence", "term_structure", "trailing_pctl")}
     for name, sig in base_signals.items():
         sig_te = sig.iloc[test_rows]
         res = evaluate.evaluate_strategy(sig_te, sig_te, test_df, name=name, seed=SEED)

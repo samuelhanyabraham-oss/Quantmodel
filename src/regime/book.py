@@ -186,6 +186,27 @@ def refresh_book_snapshot(refresh_tag: str, *, source: str, note: str = "") -> d
     current = load_book_panel()
     refresh_dir = ROOT / "data" / "raw" / refresh_tag
     prior = [ROOT / "data" / "raw" / Path(v["refresh_dir"]).name for v in m.get("versions", [])]
+    # Per-symbol continuity: every refresh close on a date the frozen raw
+    # batches (or an earlier refresh) already hold must agree to 1e-6 — a
+    # restated or re-adjusted history (e.g. a split the vendor applies
+    # retroactively) is refused, never blended. (Erratum 2026-09-30: the
+    # first version only checked the rebuilt index, which by construction
+    # used the batch values on the overlap and so could not see this.)
+    frozen_closes = _load_closes(prior)
+    fresh = pd.concat([pd.read_csv(f) for f in sorted(refresh_dir.glob("book_bars_*.csv"))])
+    fresh["date"] = pd.to_datetime(fresh["date"]).dt.normalize()
+    n_compared = {}
+    for sym, sub in fresh.groupby("symbol"):
+        if sym not in frozen_closes.columns:
+            continue
+        s_new = sub.set_index("date")["close"].astype(float)
+        common = s_new.index.intersection(frozen_closes.index[frozen_closes[sym].notna()])
+        n_compared[sym] = int(len(common))
+        if len(common) == 0:
+            raise RuntimeError(f"{sym}: refresh has no overlap with the frozen raw closes — cannot verify continuity")
+        diff = (s_new.loc[common] - frozen_closes.loc[common, sym]).abs()
+        if (diff > 1e-6).any():
+            raise RuntimeError(f"{sym}: refresh close disagrees with frozen raw close on {list(common[diff > 1e-6].date)} — restated history refused")
     closes = _load_closes([*prior, refresh_dir])
     rebuilt = _build_index(closes, _target_weights())
 
@@ -221,6 +242,7 @@ def refresh_book_snapshot(refresh_tag: str, *, source: str, note: str = "") -> d
         "refresh_dir": f"data/raw/{refresh_tag}",
         "source": source,
         "weights_asof": m["weights_asof"],
+        "overlap_closes_compared_per_symbol": n_compared,
         "note": note,
     }
     m.setdefault("versions", []).append(entry)

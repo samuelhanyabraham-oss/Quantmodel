@@ -10,7 +10,10 @@ the forward test is well-defined and un-tunable.
   net-positive model variant (NPS +0.64%/yr, AUC 0.638) — statistically
   indistinguishable from the baselines (p_raw vs persistence: 0.52).
 - **Operating point:** signal on when the probability exceeds the 70th
-  percentile of its own trailing 126 values (min 60). Rank-based, replacing
+  percentile of its own trailing 126 values (min 60). Where fewer than 60
+  prior probabilities exist (the first ~60 test rows of a walk-forward's
+  first fold) the rank is undefined and the signal reads OFF; this biases
+  those rows toward "unhedged" and is accepted as part of the frozen rule. Rank-based, replacing
   the absolute 0.20 threshold that degenerated to always-on when
   calibration shifted on the holdout.
 - **Bands (rank-based, monotone):** rank < 0.70 → 0–10%; 0.70–0.85 →
