@@ -26,7 +26,14 @@ PY = sys.executable
 def run(label: str, *cmd: str) -> tuple[int, str]:
     r = subprocess.run([PY, *cmd], cwd=ROOT, capture_output=True, text=True)
     out = (r.stdout + r.stderr).strip()
-    status = "ok" if r.returncode == 0 else "refused/failed"
+    if r.returncode == 0:
+        status = "ok"
+    elif "already logged" in out:
+        status = "skipped (already logged for this bar)"
+    elif "REFUSED" in out:
+        status = "refused: " + out.splitlines()[-1][:120]
+    else:
+        status = "FAILED: " + out.splitlines()[-1][:160]
     print(f"--- {label}: {status}")
     return r.returncode, out
 
