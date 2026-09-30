@@ -1,0 +1,70 @@
+{
+  "book_composition1": {
+    "n_rows": 1014,
+    "effective_n_approx": 101.4,
+    "base_rate": 0.333,
+    "persistence_on_frac": 0.324,
+    "mdd<=-10%": {
+      "days": 354,
+      "share_of_all_days": 0.349,
+      "label_recall": 0.63,
+      "persistence_recall": 0.511,
+      "P(big DD | label=0)": 0.194,
+      "P(big DD | label=1)": 0.66
+    },
+    "mdd<=-15%": {
+      "days": 186,
+      "share_of_all_days": 0.183,
+      "label_recall": 0.72,
+      "persistence_recall": 0.489,
+      "P(big DD | label=0)": 0.077,
+      "P(big DD | label=1)": 0.396
+    },
+    "mdd<=-20%": {
+      "days": 96,
+      "share_of_all_days": 0.095,
+      "label_recall": 0.833,
+      "persistence_recall": 0.417,
+      "P(big DD | label=0)": 0.024,
+      "P(big DD | label=1)": 0.237
+    },
+    "mdd<=-30%": {
+      "days": 13,
+      "share_of_all_days": 0.013,
+      "label_recall": 1.0,
+      "persistence_recall": 0.462,
+      "P(big DD | label=0)": 0.0,
+      "P(big DD | label=1)": 0.038
+    }
+  },
+  "spy": {
+    "n_rows": 1015,
+    "effective_n_approx": 101.5,
+    "base_rate": 0.221,
+    "persistence_on_frac": 0.216,
+    "mdd<=-3%": {
+      "days": 227,
+      "share_of_all_days": 0.224,
+      "label_recall": 0.573,
+      "persistence_recall": 0.282,
+      "P(big DD | label=0)": 0.123,
+      "P(big DD | label=1)": 0.58
+    },
+    "mdd<=-5%": {
+      "days": 75,
+      "share_of_all_days": 0.074,
+      "label_recall": 0.72,
+      "persistence_recall": 0.507,
+      "P(big DD | label=0)": 0.027,
+      "P(big DD | label=1)": 0.241
+    },
+    "mdd<=-10%": {
+      "days": 11,
+      "share_of_all_days": 0.011,
+      "label_recall": 0.909,
+      "persistence_recall": 0.909,
+      "P(big DD | label=0)": 0.001,
+      "P(big DD | label=1)": 0.045
+    }
+  }
+}

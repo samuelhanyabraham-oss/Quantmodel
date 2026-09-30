@@ -71,7 +71,10 @@ baselines gross but loses net has failed.
   10-day forward window on daily bars, the raw count overstates independent
   observations by roughly an order of magnitude. Confidence intervals must use
   the effective count (block bootstrap or Newey–West-style adjustment; method
-  documented once and reused everywhere).
+  documented once and reused everywhere). *Amended 2026-09-30:* the headline
+  effective N is the autocorrelation-based count (n over the label's
+  integrated autocorrelation time, `stats.effective_n_acf`); the original
+  n / horizon rule is still reported beside it as `effective_n_rule`.
 - Holdout: DISSOLVED by owner on 2026-08-13 (see changelog), after being
   evaluated exactly once under the pre-registered plan. All five years are
   now development data (snapshot v2, hash-locked). Consequence, stated
@@ -161,6 +164,21 @@ and the two error costs separately. Raw accuracy appears nowhere as a headline.
 
 ## Charter changelog
 
+- 2026-09-30 — Two amendments, owner-authorized ("sounds good do that then"
+  in reply to the two decisions put to them), both prompted by the
+  long-history replication (docs/long_history_plan.md):
+  (1) **Cost model:** hedge bleed raised from 2 to 4 bp/day
+  (`docs/cost_model.md`). At 2 bp a constant hedge beat every signal in
+  every fold; 4 bp is the charter's own pre-declared falsifier value and
+  the middle of realistic put-carry. Not chosen to flip a ranking: the
+  constant still leads at 4 bp. Affected comparisons re-costed in
+  `results/recost_4bp.json`; original results files untouched.
+  (2) **Effective N:** headline count is now autocorrelation-based
+  (label dependence lasts ~80 days; n/10 overstated independence ~3×);
+  the old rule stays reported as `effective_n_rule`.
+  Also this day, outside the charter: freeze v3 (`docs/freeze.md`) made the
+  persistence rule the operational SPY signal; book composition 2 built
+  from the owner's current holdings on their instruction.
 - 2026-08-13 — Holdout DISSOLVED by owner ("get rid of the holdout then i
   want this to work"). It had already been read once under the frozen plan,
   so its clean-validation value was spent; its 18 months (which contain the

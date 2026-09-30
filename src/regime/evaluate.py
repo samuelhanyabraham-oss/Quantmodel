@@ -13,7 +13,7 @@ from sklearn.metrics import brier_score_loss, precision_score, recall_score, roc
 
 from .costs import net_protection_score
 from .labels import HORIZON
-from .stats import block_bootstrap_ci, effective_n
+from .stats import block_bootstrap_ci, effective_n, effective_n_acf, timing_value_test
 
 
 def auc(y: np.ndarray, p: np.ndarray) -> float:
@@ -73,10 +73,17 @@ def evaluate_strategy(
     auc_pt, auc_lo, auc_hi = block_bootstrap_ci(auc, y, p, seed=seed)
     brier_pt, brier_lo, brier_hi = block_bootstrap_ci(brier_score_loss, y, p, seed=seed)
     lt = lead_times(signal, df["label"])
+    # Supplementary (2026-09-30): timing test under the frozen cost model —
+    # NPS vs the same signal circularly shifted. Never replaces NPS.
+    tv = timing_value_test(s, r, net_protection_score, seed=seed) if s.sum() > 0 and s.sum() < len(s) else None
     return {
         "name": name,
         "n_rows": int(len(y)),
-        "effective_n": round(effective_n(len(y)), 1),
+        # Amended 2026-09-30: headline effective N is autocorrelation-based
+        # (n / integrated autocorrelation time of the label); the original
+        # n / HORIZON rule is kept alongside as effective_n_rule.
+        "effective_n": round(effective_n_acf(y), 1),
+        "effective_n_rule": round(effective_n(len(y)), 1),
         "base_rate": round(float(np.mean(y)), 4),
         "auc": round(auc_pt, 4),
         "auc_ci90": [round(auc_lo, 4), round(auc_hi, 4)],
@@ -88,6 +95,8 @@ def evaluate_strategy(
         "false_positive_days_frac": round(float(np.mean((s == 1) & (y == 0))), 4),
         "nps_net_ann": round(net_protection_score(s, r), 5),
         "hedge_on_frac": round(float(np.mean(s)), 4),
+        "timing_excess_nps": tv["excess_over_null"] if tv else None,
+        "timing_p": tv["p_one_sided"] if tv else None,
         **{f"lead_{k}": v for k, v in lt.items()},
     }
 

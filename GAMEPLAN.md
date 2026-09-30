@@ -14,6 +14,36 @@ policy blocked Stooq/FRED/CBOE, so the frozen snapshot uses IBKR MCP daily
 bars (5-year history cap — the binding limitation), with HYG/LQD replacing
 FRED credit spreads; see docs/data_dictionary.md.
 
+**Status (2026-09-30):** forward-test operations only — no new modeling
+phase. First data refresh frozen (panel v3, book v2, through 2026-09-29,
+Robinhood-sourced, overlap-verified). Forward record scored: 3 resolved
+predictions, nothing claimable. SPY forward test paused on a missing
+VIX3M feed; book signal continues (currently out of regime). See REPORT.md
+"Forward test — first refresh".
+
+**Status (2026-09-30, later):** long-history replication done under the
+owner's "your goal is to research" instruction: 2000→2026 panel frozen
+(docs/long_history_plan.md), baselines re-established on effective N ≈ 630,
+and the single pre-registered model check ran once — no skill (AUC equals
+persistence). The 5-year result is classified as sample luck. Then L4 (16
+features, logistic + gbm, pre-registered): no skill, twice. Harness
+self-checks added: timing-value null test, autocorrelation-based effective
+N (n/10 overstates ~3×), cost break-evens, charter-enforcement tests. M = 39.
+
+**Status (2026-09-30, freeze v3):** the system operates. SPY and book legs
+both emit daily bands from the persistence rule (the only signal with
+tested timing value), model as diagnostic; `scripts/daily.py` runs the
+cycle; book compositions are versioned and rebuildable from a positions
+file. An adversarial code review found and fixed four bugs (one
+pre-existing; REPORT erratum). M = 45.
+
+**Status (2026-09-30, evening):** owner approved all four items. Done: cost
+model amended to 4 bp/day (all comparisons re-costed; models now
+net-negative, rules still positive), effective N now autocorrelation-based,
+book composition 2 built and activated from current holdings (persistence
+AUC 0.63, +13%/yr net, timing p 0.0005; model anti-skill). Still blocked:
+VIX3M — cdn.cboe.com re-probed and still denied by the network policy. M = 58.
+
 The ordering principle: **everything that could flatter a result is built and
 frozen before any model exists.** Harness → data → labels/baselines/validation →
 features → models → report. The holdout is last and gated separately.

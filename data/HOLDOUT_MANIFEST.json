@@ -23,5 +23,26 @@
   "dissolved": true,
   "dissolved_utc": "2026-08-13T12:12:57.685387+00:00",
   "full_rows": 1253,
-  "full_sha256": "73c2fe402e966a0384e9f73d4cfd5aaabda0436e608c0d4c318291f9836fa2e8"
+  "full_sha256": "73c2fe402e966a0384e9f73d4cfd5aaabda0436e608c0d4c318291f9836fa2e8",
+  "versions": [
+    {
+      "version": 3,
+      "path": "panel_v3.csv",
+      "sha256": "03e4e049ed307ffd2f29deee58d192ead672fe155b31ad2ec5a9db99c1289b95",
+      "created_utc": "2026-09-30T13:15:07.867397+00:00",
+      "rows": 1286,
+      "start": "2021-08-16",
+      "end": "2026-09-29",
+      "rows_added": 33,
+      "refresh_dir": "data/raw/refresh_2026-09-30",
+      "source": "Robinhood MCP: get_equity_historicals (SPY/QQQ/IWM/HYG/LQD + book names, day bars, RTH, split-adjusted) and get_index_historicals (VIX). VIX3M unavailable: not carried by Robinhood, CBOE blocked by network policy, IBKR MCP unauthorized this session.",
+      "missing_series_from": {
+        "VIX3M": "2026-08-13"
+      },
+      "overlap_rows_checked": 3,
+      "overlap_high_low_max_rel_diff": 0.00035,
+      "note": "First forward-test refresh. Overlap 2026-08-10..12: all closes equal to the IBKR-sourced frozen values; three high/low prints differ by cents (vendor extreme-print difference)."
+    }
+  ],
+  "active_version": 3
 }

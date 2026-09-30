@@ -17,7 +17,19 @@ def persistence(close: pd.Series) -> pd.Series:
     own trailing 75th pct threshold, all known at t) predicted to continue."""
     rv = realized_vol_trailing(close, HORIZON)
     thresh = rv.rolling(TRAIL_WINDOW, min_periods=TRAIL_WINDOW).quantile(PCTL)
-    return (rv > thresh).astype(float)
+    return _signal(rv, thresh)
+
+
+def _signal(rv: pd.Series, thresh: pd.Series) -> pd.Series:
+    """Binary signal, NaN (not 0) wherever the threshold is undefined.
+    2026-09-30 erratum: this used to return 0 during the 252-day warm-up,
+    which silently forced the signal off when a caller computed the
+    baseline on an already-truncated close (run_experiments.py and
+    book_pipeline.py did); baselines must be computed on the FULL close
+    and then aligned to the evaluation rows."""
+    out = (rv > thresh).astype(float)
+    out[thresh.isna() | rv.isna()] = float("nan")
+    return out
 
 
 def term_structure(vix: pd.Series, vix3m: pd.Series) -> pd.Series:
@@ -31,4 +43,4 @@ def trailing_pctl_rule(close: pd.Series, q: float = 0.60) -> pd.Series:
     charter wants a distinct single-threshold rule, not a duplicate of #1)."""
     rv = realized_vol_trailing(close, HORIZON)
     thresh = rv.rolling(TRAIL_WINDOW, min_periods=TRAIL_WINDOW).quantile(q)
-    return (rv > thresh).astype(float)
+    return _signal(rv, thresh)

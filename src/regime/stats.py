@@ -14,6 +14,7 @@ the overlap factor. Two tools, used everywhere and documented once here:
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 
 from .labels import HORIZON
 
@@ -22,6 +23,9 @@ N_BOOT = 2000
 
 
 def effective_n(n_rows: int, horizon: int = HORIZON) -> float:
+    """Original (2026-08-13) rule: n / HORIZON. Since the 2026-09-30
+    amendment this is reported as `effective_n_rule`; the headline
+    `effective_n` is effective_n_acf()."""
     return n_rows / horizon
 
 
@@ -59,3 +63,65 @@ def block_bootstrap_ci(
         return point, np.nan, np.nan
     lo, hi = np.quantile(vals, [alpha / 2, 1 - alpha / 2])
     return point, float(lo), float(hi)
+
+
+def timing_value_test(
+    signal: np.ndarray,
+    fwd_ret: np.ndarray,
+    score_fn,
+    *,
+    n_perm: int = 2000,
+    min_shift: int = 2 * HORIZON,
+    seed: int = 0,
+) -> dict:
+    """Does a binary signal's TIMING add value beyond its hedge-on fraction?
+
+    Added 2026-09-30 after the long-history study showed the frozen NPS is
+    dominated by a constant (always-hedged beats every rule). NPS itself is
+    unchanged — this is a supplementary test. Null: the same signal
+    circularly shifted by a random offset >= min_shift, which preserves its
+    on-fraction AND its run-length structure exactly, so the only thing
+    destroyed is alignment with the returns. Reports the observed score,
+    the null mean, the excess, and a one-sided p (P[null >= observed]).
+    A low p means the signal's timing, not its size, earns its score.
+    """
+    s = np.asarray(signal, dtype=float)
+    r = np.asarray(fwd_ret, dtype=float)
+    n = len(s)
+    if n <= 2 * min_shift + 1:
+        return {"observed": round(float(score_fn(s, r)), 5), "null_mean": None, "null_sd": None,
+                "excess_over_null": None, "p_one_sided": None, "n_perm": 0,
+                "note": f"too few rows ({n}) for a shift null with min_shift={min_shift}"}
+    rng = np.random.default_rng(seed)
+    observed = float(score_fn(s, r))
+    null = np.empty(n_perm)
+    for i in range(n_perm):
+        k = int(rng.integers(min_shift, n - min_shift))
+        null[i] = score_fn(np.roll(s, k), r)
+    return {
+        "observed": round(observed, 5),
+        "null_mean": round(float(null.mean()), 5),
+        "null_sd": round(float(null.std()), 5),
+        "excess_over_null": round(observed - float(null.mean()), 5),
+        # finite-sample p: (1 + #null >= obs) / (1 + n_perm), never exactly 0
+        "p_one_sided": round(float((1 + np.sum(null >= observed)) / (1 + n_perm)), 4),
+        "n_perm": n_perm,
+    }
+
+
+def effective_n_acf(y: np.ndarray, max_lag: int = 250) -> float:
+    """Autocorrelation-based effective sample size: n / (1 + 2 * sum of
+    positive-run autocorrelations), i.e. n over the integrated autocorrelation
+    time. Added 2026-09-30 after the long-panel check showed label
+    dependence persists ~80 days, so n / HORIZON overstates independent
+    observations ~3x. Headline `effective_n` since the 2026-09-30 charter
+    amendment; the old rule is reported as `effective_n_rule`."""
+    s = pd.Series(np.asarray(y, dtype=float))
+    n = len(s)
+    tau = 1.0
+    for k in range(1, min(max_lag, n - 2) + 1):
+        r = s.autocorr(k)
+        if not np.isfinite(r) or r <= 0:
+            break
+        tau += 2.0 * r
+    return n / tau

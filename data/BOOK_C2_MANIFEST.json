@@ -1,0 +1,30 @@
+{
+  "composition": 2,
+  "created_utc": "2026-09-30T19:55:18.103449+00:00",
+  "book_sha256": "66b12d07bf06461a50bf96611bd79ef76b5df6579e2829f29834ad4cfbe12b09",
+  "path": "book_c2_v1.csv",
+  "rows": 1295,
+  "start": "2021-08-03",
+  "end": "2026-09-29",
+  "weights_asof": "2026-09-30",
+  "positions_file": "book_positions_c2.json",
+  "target_weights": {
+    "SNDK": 0.3298,
+    "NBIS": 0.2829,
+    "SHAZ": 0.1722,
+    "CRWV": 0.0853,
+    "STM": 0.0635,
+    "APLD": 0.0606,
+    "KEEL": 0.0029,
+    "CORZ": 0.0018,
+    "TE": 0.001
+  },
+  "source": "Robinhood MCP day bars (raw batches + refresh_2026-09-30 incl. STM)",
+  "refresh_dirs_used": [
+    "refresh_2026-09-30"
+  ],
+  "excluded": [
+    "GPUSB (no market data)"
+  ],
+  "note": "Owner's combined holdings (individual margin + Roth IRA) read 2026-09-30 15:47 UTC, built on the owner's instruction ('sounds good do that then', 2026-09-30) after the report flagged the 2026-08-13 weights as stale. Versus composition 1: IREN, CLSK, BTDR, DRAM fully exited; STM new; SNDK 15 -> 48; NBIS 211 -> 300; APLD 400 -> 600; CRWV 200 -> 250; SHAZ 607 -> 800; TE 1068 -> 70. GPUSB (private program stock, no market data) excluded. Weights are CURRENT market-value weights at the 2026-09-29 official close, projected back through history (same documented assumption as composition 1). Composition 1 is retained untouched; entries logged under it are scored against it."
+}

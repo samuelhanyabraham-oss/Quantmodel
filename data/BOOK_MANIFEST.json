@@ -23,5 +23,22 @@
   "excluded": [
     "GPUSB (no market data)",
     "BMNR Jan-2027 option"
-  ]
+  ],
+  "versions": [
+    {
+      "version": 2,
+      "path": "book_v2.csv",
+      "sha256": "116e0eeb2fc83224359b5e30910b202044180f88eafa4a8195dec39e08ce8668",
+      "created_utc": "2026-09-30T13:15:07.953462+00:00",
+      "rows": 1285,
+      "start": "2021-08-17",
+      "end": "2026-09-29",
+      "rows_added": 33,
+      "refresh_dir": "data/raw/refresh_2026-09-30",
+      "source": "Robinhood MCP: get_equity_historicals (SPY/QQQ/IWM/HYG/LQD + book names, day bars, RTH, split-adjusted) and get_index_historicals (VIX). VIX3M unavailable: not carried by Robinhood, CBOE blocked by network policy, IBKR MCP unauthorized this session.",
+      "weights_asof": "2026-08-13",
+      "note": "First forward-test refresh. Overlap 2026-08-10..12: all closes equal to the IBKR-sourced frozen values; three high/low prints differ by cents (vendor extreme-print difference)."
+    }
+  ],
+  "active_version": 2
 }

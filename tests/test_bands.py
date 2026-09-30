@@ -43,3 +43,32 @@ def test_band_edges_match_freeze_doc():
 def test_out_of_range_rejected():
     with pytest.raises(ValueError):
         hedge_band(1.5)
+
+
+def test_rv_rank_bands_monotone_and_rule_consistent():
+    from regime.bands import RV_RANK_BANDS, hedge_band_from_rv_rank
+    from regime.labels import PCTL
+    assert RV_RANK_BANDS[1][0] == PCTL  # the middle cut IS the persistence rule's cut
+    prev = (0.0, 0.0)
+    for r in [i / 100 for i in range(101)]:
+        lo, hi = hedge_band_from_rv_rank(r)
+        assert lo >= prev[0] and hi >= prev[1] and lo <= hi
+        prev = (lo, hi)
+    assert hedge_band_from_rv_rank(0.74) == (0.0, 0.10)
+    assert hedge_band_from_rv_rank(0.75) == (0.25, 0.50)
+    assert hedge_band_from_rv_rank(0.90) == (0.50, 0.75)
+
+
+def test_strict_rv_rank_matches_persistence_rule_on_every_bar():
+    """Freeze v3: rank >= 0.75 must coincide with rv10 > interpolated q75."""
+    import numpy as np
+    from regime import data, labels
+    from regime.labels import PCTL, TRAIL_WINDOW, realized_vol_trailing
+    spy = data.load_dev_panel()["SPY_close"]
+    rv = realized_vol_trailing(spy, labels.HORIZON)
+    thresh = rv.rolling(TRAIL_WINDOW, min_periods=TRAIL_WINDOW).quantile(PCTL)
+    vals = rv.to_numpy()
+    for i in range(TRAIL_WINDOW + labels.HORIZON, len(vals)):
+        window = vals[i - TRAIL_WINDOW + 1 : i + 1]
+        rank = float(np.mean(window < vals[i]))
+        assert (rank >= PCTL) == (vals[i] > thresh.iloc[i]), (rv.index[i], rank, vals[i], thresh.iloc[i])

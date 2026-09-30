@@ -24,12 +24,13 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from sklearn.preprocessing import StandardScaler
 
 from regime import baselines, book, data, evaluate, experiment_log, labels, models
-from regime.bands import hedge_band_from_rank
-from regime.labels import realized_vol_trailing
+from regime.bands import hedge_band_from_rv_rank
+from regime.labels import PCTL, TRAIL_WINDOW, realized_vol_trailing
 from regime.validation import purged_walk_forward
 
 SEED = 20260813
@@ -64,6 +65,7 @@ def build_dataset() -> pd.DataFrame:
     lab = labels.build_labels(close)
     out = df.join(lab).join(f)
     out["fwd_ret_10"] = close.shift(-labels.HORIZON) / close - 1.0
+    out["persistence"] = baselines.persistence(close)  # on the FULL close (erratum 2026-09-30)
     return out
 
 
@@ -74,33 +76,42 @@ def cmd_evaluate() -> None:
     test_df = df.iloc[test_rows]
     snap = book.book_snapshot_hash()
 
-    persist = baselines.persistence(df["BOOK_close"]).iloc[test_rows]
+    persist = df["persistence"].iloc[test_rows]
     res_p = evaluate.evaluate_strategy(persist, persist, test_df, name="book_persistence", seed=SEED)
     experiment_log.log_run(
-        {"strategy": "book_persistence", "type": "baseline", "universe": "book"},
+        {"strategy": "book_persistence", "type": "baseline", "universe": "book", "composition": book.active_composition()},
         res_p, seed=SEED, data_snapshot_hash=snap, notes="book walk-forward")
 
     probs = models.walk_forward_probs(df[BOOK_FEATURES], df["label"], "logistic", seed=SEED)
     p_te = probs.iloc[test_rows]
     roll_q = probs.rolling(RANK_WINDOW, min_periods=60).quantile(0.70)
     s_te = (probs >= roll_q).astype(float).iloc[test_rows]
-    res_m = evaluate.evaluate_strategy(p_te, s_te, test_df, name="book_logistic_adaptive", seed=SEED)
+    # A fold whose training rows hold a single class is skipped by
+    # walk_forward_probs (probs NaN there); the model is scored on the
+    # remaining test rows only, and the count is recorded.
+    ok = p_te.notna().to_numpy()
+    res_m = evaluate.evaluate_strategy(p_te[ok], s_te[ok], test_df[ok], name="book_logistic_adaptive", seed=SEED)
+    res_m["test_rows_skipped_degenerate_fold"] = int((~ok).sum())
     diff, p_raw = evaluate.auc_diff_pvalue(
-        test_df["label"].to_numpy(), p_te.to_numpy(), persist.to_numpy(dtype=float), seed=SEED)
+        test_df["label"].to_numpy()[ok], p_te.to_numpy()[ok], persist.to_numpy(dtype=float)[ok], seed=SEED)
     res_m["auc_minus_persistence"] = round(diff, 4)
     res_m["p_raw_vs_persistence"] = round(p_raw, 4)
     experiment_log.log_run(
         {"strategy": "book_logistic_adaptive", "type": "model", "universe": "book",
-         "features": BOOK_FEATURES}, res_m, seed=SEED, data_snapshot_hash=snap,
+         "composition": book.active_composition(), "features": BOOK_FEATURES}, res_m, seed=SEED, data_snapshot_hash=snap,
         notes="book walk-forward, adaptive q70 operating point")
     M = experiment_log.run_count()
     res_m["run_count_M"] = M
     res_m["p_bonferroni"] = round(min(1.0, p_raw * M), 4)
 
-    out = {"book_persistence": res_p, "book_logistic_adaptive": res_m}
+    comp = book.active_composition()
+    out = {"composition": comp, "book_hash": snap, "book_persistence": res_p, "book_logistic_adaptive": res_m}
     (ROOT / "results").mkdir(exist_ok=True)
-    (ROOT / "results" / "book_walk_forward.json").write_text(json.dumps(out, indent=2) + "\n")
+    name = "book_walk_forward.json" if comp == 1 else f"book_walk_forward_c{comp}.json"
+    (ROOT / "results" / name).write_text(json.dumps(out, indent=2) + "\n")
     for k, r in out.items():
+        if not isinstance(r, dict):
+            continue
         print(f"{k:24s} AUC={r['auc']:.3f} {r['auc_ci90']} Brier={r['brier']:.3f} "
               f"NPS={r['nps_net_ann']:+.4f} on={r['hedge_on_frac']:.2f} FNrate={r['false_negative_rate']:.2f}")
     print(f"model vs book-persistence: AUC diff {res_m['auc_minus_persistence']:+.4f} "
@@ -119,40 +130,63 @@ def cmd_predict() -> None:
     calibrate = models._fit_sigmoid_calibrator(
         model.predict_proba(scaler.transform(Xtr[cut:]))[:, 1], ytr[cut:])
 
+    latest = df.index.max()
+    # The OPERATIONAL inputs (book RV, its threshold, beta) must exist on the
+    # latest bar — refuse a stale reading. The model diagnostic may be
+    # unavailable (it needs VIX3M via vix_slope, undelivered since
+    # 2026-08-13); it is then logged as null, not as a stale number.
+    for col in ("brv10", "rv_thresh", "beta63"):
+        if pd.isna(df.loc[latest, col]):
+            raise SystemExit(f"REFUSED: {col} not computable on latest bar {latest.date()}")
     scorable = df[BOOK_FEATURES].dropna()
-    recent = scorable.iloc[-(RANK_WINDOW + 1):]
-    probs = calibrate(model.predict_proba(scaler.transform(recent.to_numpy(dtype=float)))[:, 1])
-    p_today = float(probs[-1])
-    rank = float(np.mean(probs[:-1] <= p_today))
-    beta = float(df["beta63"].dropna().iloc[-1])
-    brv = float(df["brv10"].dropna().iloc[-1])
-    thresh = float(df["rv_thresh"].dropna().iloc[-1])
+    if scorable.index[-1] == latest:
+        recent = scorable.iloc[-(RANK_WINDOW + 1):]
+        probs = calibrate(model.predict_proba(scaler.transform(recent.to_numpy(dtype=float)))[:, 1])
+        p_today = round(float(probs[-1]), 4)
+        rank = round(float(np.mean(probs[:-1] <= p_today)), 4)
+    else:
+        missing = [c for c in BOOK_FEATURES if pd.isna(df.loc[latest, c])]
+        print(f"model diagnostic unavailable on {latest.date()}: features {missing} missing")
+        p_today, rank = None, None
+    beta = float(df.loc[latest, "beta63"])
+    brv = float(df.loc[latest, "brv10"])
+    thresh = float(df.loc[latest, "rv_thresh"])
 
     # OPERATIONAL SIGNAL = the persistence rule on the book, not the model.
-    # Book walk-forward (results/book_walk_forward.json): the fitted model
-    # scored AUC 0.38 (anti-skill) while book-persistence scored 0.64 with
-    # NPS +18%/yr — on a book whose 10-day drawdowns dwarf hedge bleed, the
-    # simple rule is the only defensible signal. Model prob/rank stay in the
-    # record as diagnostics and for the forward test.
+    # Book walk-forward (results/book_walk_forward.json, corrected in the
+    # REPORT erratum): the fitted model scored AUC 0.38 (anti-skill) while
+    # book-persistence scored 0.61 with NPS +19%/yr — on a book whose 10-day
+    # drawdowns dwarf hedge bleed, the simple rule is the only defensible
+    # signal. Freeze v3 bands: the trailing-252 percentile rank of the
+    # book's rv10 (0.75 = the rule's own cut, 0.90 = the top band).
     in_regime = brv > thresh
-    band = hedge_band_from_rank(0.75 if in_regime else 0.0)
+    rv_window = df["brv10"].loc[:latest].dropna().iloc[-TRAIL_WINDOW:]
+    rv_rank = float(np.mean(rv_window.to_numpy() < brv))  # strict: rank >= 0.75 <=> brv > thresh
+    band = hedge_band_from_rv_rank(rv_rank)
 
+    comp = book.active_composition()
     entry = {
-        "asof": str(recent.index[-1].date()),
+        "asof": str(latest.date()),
         "universe": "book",
+        "book_composition": comp,
         "signal_rule": "book_persistence (rv10 > trailing 1y q75)",
         "in_regime": bool(in_regime),
         "signal": int(in_regime),
+        "book_rv10_rank252": round(rv_rank, 4),
         "band_lo": band[0], "band_hi": band[1],
-        "model_prob_diagnostic": round(p_today, 4),
-        "model_rank_diagnostic": round(rank, 4),
+        "model_prob_diagnostic": p_today,
+        "model_rank_diagnostic": rank,
         "book_rv10_ann": round(brv, 4),
         "book_regime_thresh": round(thresh, 4),
         "book_beta63_vs_spy": round(beta, 2),
         "spy_hedge_notional_per_100k_book": round(1e5 * (band[0] + band[1]) / 2 * beta),
-        "config": "book-v1 persistence-operational, logistic diagnostic",
-        "label_resolves_after": str((recent.index[-1] + pd.tseries.offsets.BDay(labels.HORIZON)).date()),
+        "config": f"book-c{comp} freeze-v3 persistence-operational, logistic diagnostic",
+        "label_resolves_after": str((latest + pd.tseries.offsets.BDay(labels.HORIZON)).date()),
     }
+    from predict_today import already_logged  # same idempotency rule
+    if already_logged(entry["asof"], entry["config"], "book"):
+        print(json.dumps(entry, indent=2))
+        raise SystemExit(f"already logged for {entry['asof']} — not appended twice")
     with open(ROOT / "forward_test.jsonl", "a", encoding="utf-8") as fh:
         fh.write(json.dumps(entry, sort_keys=True) + "\n")
     experiment_log.log_run(
@@ -167,7 +201,18 @@ def cmd_predict() -> None:
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "predict"
     if cmd == "build":
-        print(json.dumps(book.build_book_snapshot(), indent=2))
+        # build [--composition N] [--refresh-dir data/raw/<tag> ...] [--activate "<reason>"]
+        import argparse
+        ap = argparse.ArgumentParser(prog="book_pipeline.py build")
+        ap.add_argument("--composition", type=int, default=1)
+        ap.add_argument("--refresh-dir", action="append", default=[])
+        ap.add_argument("--source", default="")
+        ap.add_argument("--activate", metavar="REASON", default=None)
+        a = ap.parse_args(sys.argv[2:])
+        print(json.dumps(book.build_book_snapshot(a.composition, refresh_dirs=[ROOT / d for d in a.refresh_dir],
+                                                  source=a.source), indent=2))
+        if a.activate is not None:
+            print(json.dumps(book.set_active_composition(a.composition, a.activate), indent=2))
     elif cmd == "evaluate":
         cmd_evaluate()
     elif cmd == "predict":

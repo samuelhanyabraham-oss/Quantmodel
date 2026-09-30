@@ -1,0 +1,275 @@
+{
+  "panel_hash": "76eeb00bbf24ef81e4ee3ad786fc0296eaeb4eb18476fa92fd9d2dc38c9e5051",
+  "spec": "docs/long_history_plan.md @ 77f207e",
+  "rows": 6123,
+  "span": [
+    "2002-05-10",
+    "2026-09-15"
+  ],
+  "n_folds": 10,
+  "model": {
+    "name": "logistic_small3_adaptive_long",
+    "n_rows": 5973,
+    "effective_n": 597.3,
+    "base_rate": 0.2495,
+    "auc": 0.7164,
+    "auc_ci90": [
+      0.6783,
+      0.7509
+    ],
+    "brier": 0.1709,
+    "brier_ci90": [
+      0.1547,
+      0.1872
+    ],
+    "precision": 0.4177,
+    "recall": 0.5128,
+    "false_negative_rate": 0.4872,
+    "false_positive_days_frac": 0.1783,
+    "nps_net_ann": 0.01392,
+    "hedge_on_frac": 0.3062,
+    "lead_n_onsets": 125,
+    "lead_n_missed": 88,
+    "lead_median_lead_days": 5.0,
+    "lead_mean_lead_days": 5.162162162162162,
+    "auc_minus_persistence": 0.0006,
+    "p_raw_vs_persistence": 0.4875,
+    "timing_value": -0.00676
+  },
+  "baselines": {
+    "persistence": {
+      "name": "persistence",
+      "n_rows": 5973,
+      "effective_n": 597.3,
+      "base_rate": 0.2495,
+      "auc": 0.7159,
+      "auc_ci90": [
+        0.684,
+        0.7458
+      ],
+      "brier": 0.2079,
+      "brier_ci90": [
+        0.1838,
+        0.2317
+      ],
+      "precision": 0.5866,
+      "recall": 0.5638,
+      "false_negative_rate": 0.4362,
+      "false_positive_days_frac": 0.0991,
+      "nps_net_ann": 0.02082,
+      "hedge_on_frac": 0.2397,
+      "lead_n_onsets": 125,
+      "lead_n_missed": 102,
+      "lead_median_lead_days": 8.0,
+      "lead_mean_lead_days": 6.608695652173913,
+      "timing_value": 0.00463
+    },
+    "trailing_pctl": {
+      "name": "trailing_pctl",
+      "n_rows": 5973,
+      "effective_n": 597.3,
+      "base_rate": 0.2495,
+      "auc": 0.7139,
+      "auc_ci90": [
+        0.6836,
+        0.7415
+      ],
+      "brier": 0.2777,
+      "brier_ci90": [
+        0.2513,
+        0.3047
+      ],
+      "precision": 0.4624,
+      "recall": 0.6973,
+      "false_negative_rate": 0.3027,
+      "false_positive_days_frac": 0.2022,
+      "nps_net_ann": 0.02443,
+      "hedge_on_frac": 0.3762,
+      "lead_n_onsets": 125,
+      "lead_n_missed": 78,
+      "lead_median_lead_days": 7.0,
+      "lead_mean_lead_days": 6.212765957446808,
+      "timing_value": -0.00098
+    }
+  },
+  "always_hedged_nps": 0.06755,
+  "M": 36,
+  "p_raw": 0.4875,
+  "p_bonferroni": 1.0,
+  "beats_both_baselines_net": false,
+  "verdict": "NO SKILL CLAIMED",
+  "per_fold": [
+    {
+      "fold": 0,
+      "start": "2002-12-12",
+      "end": "2005-04-27",
+      "auc": 0.485,
+      "persistence_auc": 0.616,
+      "model_nps": -0.00938,
+      "persistence_nps": -0.0094
+    },
+    {
+      "fold": 1,
+      "start": "2005-04-28",
+      "end": "2007-09-11",
+      "auc": 0.831,
+      "persistence_auc": 0.756,
+      "model_nps": -0.01088,
+      "persistence_nps": -0.00104
+    },
+    {
+      "fold": 2,
+      "start": "2007-09-12",
+      "end": "2010-01-26",
+      "auc": 0.73,
+      "persistence_auc": 0.733,
+      "model_nps": 0.0761,
+      "persistence_nps": 0.085
+    },
+    {
+      "fold": 3,
+      "start": "2010-01-27",
+      "end": "2012-06-08",
+      "auc": 0.784,
+      "persistence_auc": 0.81,
+      "model_nps": 0.00969,
+      "persistence_nps": 0.03763
+    },
+    {
+      "fold": 4,
+      "start": "2012-06-11",
+      "end": "2014-10-23",
+      "auc": 0.699,
+      "persistence_auc": 0.554,
+      "model_nps": 0.00025,
+      "persistence_nps": -0.00873
+    },
+    {
+      "fold": 5,
+      "start": "2014-10-24",
+      "end": "2017-03-09",
+      "auc": 0.751,
+      "persistence_auc": 0.702,
+      "model_nps": 0.00312,
+      "persistence_nps": 0.00492
+    },
+    {
+      "fold": 6,
+      "start": "2017-03-10",
+      "end": "2019-07-24",
+      "auc": 0.748,
+      "persistence_auc": 0.75,
+      "model_nps": 0.02065,
+      "persistence_nps": 0.02724
+    },
+    {
+      "fold": 7,
+      "start": "2019-07-25",
+      "end": "2021-12-06",
+      "auc": 0.66,
+      "persistence_auc": 0.719,
+      "model_nps": 0.04087,
+      "persistence_nps": 0.04152
+    },
+    {
+      "fold": 8,
+      "start": "2021-12-07",
+      "end": "2024-04-23",
+      "auc": 0.837,
+      "persistence_auc": 0.741,
+      "model_nps": 0.00228,
+      "persistence_nps": 0.03189
+    },
+    {
+      "fold": 9,
+      "start": "2024-04-24",
+      "end": "2026-09-15",
+      "auc": 0.639,
+      "persistence_auc": 0.617,
+      "model_nps": 0.00739,
+      "persistence_nps": -0.00076
+    }
+  ],
+  "stress_windows": {
+    "dotcom_2001_02": {
+      "rows": 74,
+      "model_nps": -0.00356,
+      "persistence_nps": -0.01225,
+      "model_on": 0.135,
+      "model_missed": 2,
+      "onsets": 3
+    },
+    "gfc_2008_09": {
+      "rows": 146,
+      "model_nps": 0.30012,
+      "persistence_nps": 0.31584,
+      "model_on": 0.377,
+      "model_missed": 5,
+      "onsets": 5
+    },
+    "flash_crash_2010": {
+      "rows": 54,
+      "model_nps": 0.11577,
+      "persistence_nps": 0.15488,
+      "model_on": 0.5,
+      "model_missed": 2,
+      "onsets": 3
+    },
+    "eurozone_2011": {
+      "rows": 76,
+      "model_nps": 0.03078,
+      "persistence_nps": 0.17249,
+      "model_on": 0.408,
+      "model_missed": 0,
+      "onsets": 0
+    },
+    "china_2015": {
+      "rows": 42,
+      "model_nps": 0.01512,
+      "persistence_nps": 0.05015,
+      "model_on": 0.476,
+      "model_missed": 1,
+      "onsets": 1
+    },
+    "volmageddon_2018": {
+      "rows": 31,
+      "model_nps": 0.18135,
+      "persistence_nps": 0.08404,
+      "model_on": 0.903,
+      "model_missed": 0,
+      "onsets": 0
+    },
+    "q4_2018": {
+      "rows": 63,
+      "model_nps": 0.25002,
+      "persistence_nps": 0.20476,
+      "model_on": 0.889,
+      "model_missed": 0,
+      "onsets": 1
+    },
+    "covid_2020": {
+      "rows": 52,
+      "model_nps": 0.482,
+      "persistence_nps": 0.48878,
+      "model_on": 0.615,
+      "model_missed": 0,
+      "onsets": 0
+    },
+    "bear_2022": {
+      "rows": 209,
+      "model_nps": 0.03,
+      "persistence_nps": 0.10634,
+      "model_on": 0.301,
+      "model_missed": 5,
+      "onsets": 6
+    },
+    "tariff_2025": {
+      "rows": 63,
+      "model_nps": 0.06457,
+      "persistence_nps": 0.11554,
+      "model_on": 0.54,
+      "model_missed": 2,
+      "onsets": 2
+    }
+  }
+}

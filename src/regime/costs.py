@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import numpy as np
 
-C_BLEED = 0.0002  # 2 bp/day while hedged
+C_BLEED = 0.0004  # 4 bp/day while hedged (amended 2026-09-30 from 2 bp; see docs/cost_model.md)
+C_BLEED_ORIGINAL = 0.0002  # frozen 2026-08-13 value, kept for the recost record
 C_SWITCH = 0.0010  # 10 bp per on/off switch
 CAPTURE = 0.5  # fraction of drawdown the overlay offsets
 ANN_DAYS = 252
