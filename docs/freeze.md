@@ -15,7 +15,12 @@ M = 41) the evidence is unambiguous and this freeze follows it:
 **Operational signal (SPY):** the charter's baseline #1, unchanged in
 definition — trailing 10-day realized vol of SPY above the 75th percentile
 of its own trailing 252-day history. Its continuous score is the trailing
-percentile RANK of today's rv10 within the trailing 252 rv10 values.
+percentile RANK of today's rv10: the fraction of the trailing 252 rv10
+values (today's included in the window) that lie STRICTLY below today's.
+With the threshold being the interpolated 75th percentile, rank ≥ 0.75 is
+exactly the rule (a test asserts this on every bar of the panel). The
+2026-09-29 entries were logged with a non-strict rank before this was
+tightened; neither band was affected (ranks 0.53 and 0.11).
 
 **Bands (monotone, piecewise-constant, three):**
 

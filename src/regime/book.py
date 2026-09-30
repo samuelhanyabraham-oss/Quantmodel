@@ -191,7 +191,7 @@ def build_book_snapshot(composition: int = 1, *, refresh_dirs: list[Path] | None
         "positions_file": paths["positions"].name,
         "target_weights": {k: round(v, 4) for k, v in sorted(target_w.items(), key=lambda kv: -kv[1])},
         "source": source or pos.get("source", ""),
-        "refresh_dirs_used": [str(Path(d).relative_to(ROOT)) if Path(d).is_absolute() else str(d) for d in (refresh_dirs or [])],
+        "refresh_dirs_used": [Path(d).name for d in (refresh_dirs or [])],  # under data/raw/
         "excluded": pos.get("excluded", []),
         "note": note or pos.get("note", ""),
     }
@@ -249,7 +249,7 @@ def refresh_book_snapshot(refresh_tag: str, *, composition: int | None = None,
     current = load_book_panel(p["composition"])
     refresh_dir = DATA_DIR / "raw" / refresh_tag
     prior = [DATA_DIR / "raw" / Path(v["refresh_dir"]).name for v in m.get("versions", [])]
-    prior += [ROOT / d for d in m.get("refresh_dirs_used", [])]
+    prior += [DATA_DIR / "raw" / Path(d).name for d in m.get("refresh_dirs_used", [])]
 
     # Per-symbol continuity: every refresh close on a date the frozen raw
     # batches (or an earlier refresh) already hold must agree to 1e-6 — a

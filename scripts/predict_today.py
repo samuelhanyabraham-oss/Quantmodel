@@ -90,7 +90,11 @@ def main() -> None:
     if pd.isna(rv.loc[latest]) or pd.isna(thresh.loc[latest]):
         raise SystemExit(f"REFUSED: persistence rule not computable on latest bar {latest.date()}")
     window = rv.loc[:latest].iloc[-TRAIL_WINDOW:]
-    rank = float(np.mean(window.to_numpy() <= rv.loc[latest]))
+    # STRICT rank (fraction of the trailing 252 rv10 values below today's):
+    # with the label threshold being pandas' interpolated 75th percentile,
+    # rank >= 0.75 <=> rv > thresh exactly; a non-strict rank disagreed at
+    # rank == 0.75 on 4 of 1,025 historical bars (review 2026-09-30).
+    rank = float(np.mean(window.to_numpy() < rv.loc[latest]))
     in_regime = bool(rv.loc[latest] > thresh.loc[latest])
     band = hedge_band_from_rv_rank(rank)
     feats = features.build_features(panel)

@@ -152,7 +152,7 @@ def cmd_predict() -> None:
     # book's rv10 (0.75 = the rule's own cut, 0.90 = the top band).
     in_regime = brv > thresh
     rv_window = df["brv10"].loc[:latest].dropna().iloc[-TRAIL_WINDOW:]
-    rv_rank = float(np.mean(rv_window.to_numpy() <= brv))
+    rv_rank = float(np.mean(rv_window.to_numpy() < brv))  # strict: rank >= 0.75 <=> brv > thresh
     band = hedge_band_from_rv_rank(rv_rank)
 
     comp = book.active_composition()

@@ -78,3 +78,30 @@ def test_missing_name_refuses(sandbox):
         {"asof": "x", "shares": {"AAA": 1, "ZZZ": 1}, "last_close": {"AAA": 1.0, "ZZZ": 1.0}}))
     with pytest.raises(RuntimeError, match="no raw closes"):
         book.build_book_snapshot(3)
+
+
+def test_build_with_refresh_dir_then_refresh_chain_and_subcent_restatement(sandbox):
+    tmp, dates, closes = sandbox
+    # composition 2 built including refresh_x; a later refresh must find it
+    m2 = book.build_book_snapshot(2, refresh_dirs=[tmp / "raw" / "refresh_x"])
+    assert m2["refresh_dirs_used"] == ["refresh_x"]
+    rd = tmp / "raw" / "refresh_z"; rd.mkdir()
+    rows = ["symbol,date,close"]
+    extra = pd.bdate_range(dates[-1] + pd.Timedelta(days=1), periods=5)
+    for s, c in closes.items():
+        for d, v in zip(dates[295:], c[295:]):
+            rows.append(f"{s},{d.date()},{v:.4f}")
+        for d in extra:
+            rows.append(f"{s},{d.date()},{c[-1]:.4f}")
+    (rd / "book_bars_1.csv").write_text("\n".join(rows) + "\n")
+    e = book.refresh_book_snapshot("refresh_z", composition=2, source="synthetic")
+    assert e["rows_added"] == 5
+    # a sub-cent restatement of one batch-overlap close is refused
+    rd2 = tmp / "raw" / "refresh_w"; rd2.mkdir()
+    rows = ["symbol,date,close"]
+    for s, c in closes.items():
+        for d, v in zip(dates[270:280], c[270:280]):
+            rows.append(f"{s},{d.date()},{(v + (0.001 if s == 'BBB' and d == dates[272] else 0)):.4f}")
+    (rd2 / "book_bars_1.csv").write_text("\n".join(rows) + "\n")
+    with pytest.raises(RuntimeError, match="restated history"):
+        book.refresh_book_snapshot("refresh_w", composition=2, source="synthetic")

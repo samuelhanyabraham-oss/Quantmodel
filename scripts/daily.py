@@ -64,8 +64,7 @@ def main() -> None:
         extra = f"  beta {e['book_beta63_vs_spy']}  SPY-equiv/100k {e['spy_hedge_notional_per_100k_book']}" if uni == "book" else ""
         print(f"{e['asof']}  {uni:5s}  regime={'ON ' if e['signal'] else 'off'}  band {e['band_lo']:.0%}-{e['band_hi']:.0%}  "
               f"rank {e.get('rv10_rank252', e.get('book_rv10_rank252'))}{extra}")
-    from regime import experiment_log  # noqa: E402
-    sys.path.insert(0, str(ROOT / "src"))
+    from regime import experiment_log  # noqa: E402  (src on sys.path from __main__)
     print(f"ledger M = {experiment_log.run_count()}")
 
 

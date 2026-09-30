@@ -66,8 +66,8 @@ def audit_spy(which: str = "full") -> dict:
 
 
 def audit_book() -> dict:
-    m = book.load_book_manifest()
-    path = book.BOOK_SNAP
+    m = book.load_book_manifest(1)
+    path = book._snap_dir() / "book_v1.csv"
     assert book._sha256(path) == m["book_sha256"]
     bk = pd.read_csv(path, index_col="date", parse_dates=["date"])
     mkt = pd.read_csv(data.SNAP_DIR / "panel_full.csv", index_col="date", parse_dates=["date"])

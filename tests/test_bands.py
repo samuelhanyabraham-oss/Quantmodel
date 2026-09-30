@@ -57,3 +57,18 @@ def test_rv_rank_bands_monotone_and_rule_consistent():
     assert hedge_band_from_rv_rank(0.74) == (0.0, 0.10)
     assert hedge_band_from_rv_rank(0.75) == (0.25, 0.50)
     assert hedge_band_from_rv_rank(0.90) == (0.50, 0.75)
+
+
+def test_strict_rv_rank_matches_persistence_rule_on_every_bar():
+    """Freeze v3: rank >= 0.75 must coincide with rv10 > interpolated q75."""
+    import numpy as np
+    from regime import data, labels
+    from regime.labels import PCTL, TRAIL_WINDOW, realized_vol_trailing
+    spy = data.load_dev_panel()["SPY_close"]
+    rv = realized_vol_trailing(spy, labels.HORIZON)
+    thresh = rv.rolling(TRAIL_WINDOW, min_periods=TRAIL_WINDOW).quantile(PCTL)
+    vals = rv.to_numpy()
+    for i in range(TRAIL_WINDOW + labels.HORIZON, len(vals)):
+        window = vals[i - TRAIL_WINDOW + 1 : i + 1]
+        rank = float(np.mean(window < vals[i]))
+        assert (rank >= PCTL) == (vals[i] > thresh.iloc[i]), (rv.index[i], rank, vals[i], thresh.iloc[i])
